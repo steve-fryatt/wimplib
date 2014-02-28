@@ -1,0 +1,38 @@
+REM >BASIC:Resources
+REM
+REM Universal resource handling library
+REM (c) Stephen Fryatt, 1999
+REM
+REM Version 0.01 - 15 March 1999
+
+
+
+
+DEF FNfind_latest_resources(dir$,prefix$,need%)
+:
+REM Version 0.01
+REM
+REM Returns the latest file possible for the given version number.  If prefix is set, only files
+REM staring with that text are checked.
+:
+LOCAL next%,version%,file_name$,version$
+:
+next%=0
+version%=-1
+:
+REPEAT
+ SYS "OS_GBPB",11,dir$,a%,1,next%,255,"*" TO ,,,read%,next%
+ IF read%>0 THEN
+  file_name$=FNzero_string(a%+29)
+  IF prefix$<>"" OR LEFT$(file_name$,LEN(prefix$))=prefix$ THEN
+   IF prefix$<>"" THEN file_name$=MID$(file_name$,LEN(prefix$)+1)
+
+   IF VAL(file_name$)>version% AND VAL(file_name$)<=need% THEN
+    version%=VAL(file_name$)
+    version$=file_name$
+   ENDIF
+  ENDIF
+ ENDIF
+UNTIL next%=-1
+:
+=version$

@@ -1,0 +1,127 @@
+REM >BASIC:String
+REM
+REM String handling library
+REM (c) Stephen Fryatt, 2001
+REM
+REM Version 0.02 - 8 February 2001
+
+
+DEF FNzero_string(string%)
+:
+REM Return as a BASIC string a null terminated string.
+:
+LOCAL string$
+:
+WHILE ?string%<>0
+ string$+=CHR$(?string%)
+ string%+=1
+ENDWHILE
+=string$
+:
+:
+:
+:
+REM --------------------------------------------------------------------------------------------------------------------
+:
+:
+:
+:
+DEF FNctrl_string(string%)
+:
+REM Return as a BASIC string a control character terminated string.
+:
+LOCAL string$
+:
+WHILE ?string%>=32
+ string$+=CHR$(?string%)
+ string%+=1
+ENDWHILE
+=string$
+:
+:
+:
+:
+REM --------------------------------------------------------------------------------------------------------------------
+:
+:
+:
+:
+DEF FNextract_ctrl_string(RETURN string%)
+:
+REM Return as a BASIC string a control character terminated string.  Update string% to point to the next piece of data.
+:
+LOCAL string$
+:
+WHILE ?string%>=32
+ string$+=CHR$(?string%)
+ string%+=1
+ENDWHILE
+=string$
+:
+:
+:
+:
+REM --------------------------------------------------------------------------------------------------------------------
+:
+:
+:
+:
+DEF FNstrip_surrounding_whitespace(s$)
+:
+REM Remove any whitespace around the string
+:
+WHILE ASC(LEFT$(s$,1))<=32 AND LEN(s$)>0
+ s$=MID$(s$,2)
+ENDWHILE
+WHILE ASC(RIGHT$(s$))<=32 AND LEN(s$)>0
+ s$=LEFT$(s$)
+ENDWHILE
+:
+=s$
+:
+:
+:
+:
+REM --------------------------------------------------------------------------------------------------------------------
+:
+:
+:
+:
+DEF FNto_upper(string$)
+:
+REM Force a string to upper case.
+:
+LOCAL loop%,char%,table%
+:
+SYS "Territory_UpperCaseTable",-1 TO table%
+:
+FOR loop%=1 TO LEN(string$)
+ char%=ASC(MID$(string$,loop%,1))
+ MID$(string$,loop%,1)=CHR$(table%?char%)
+NEXT loop%
+:
+=string$
+:
+:
+:
+:
+REM --------------------------------------------------------------------------------------------------------------------
+:
+:
+:
+:
+DEF FNto_lower(string$)
+:
+REM Force a string to lower case.
+:
+LOCAL loop%,char%,table%
+:
+SYS "Territory_LowerCaseTable",-1 TO table%
+:
+FOR loop%=1 TO LEN(string$)
+ char%=ASC(MID$(string$,loop%,1))
+ MID$(string$,loop%,1)=CHR$(table%?char%)
+NEXT loop%
+:
+=string$
+

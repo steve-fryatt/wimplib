@@ -1,0 +1,197 @@
+REM >Config
+REM
+REM Configuration handling library
+REM (c) Stephen Fryatt, 1999
+REM
+REM Version 0.01 - 28 January 1999
+REM         0.02 - 16 June    2001
+
+
+DEF PROCinitialise_config(options%,app_name$)
+:
+DIM configuration_data$(options%-1,2)
+configuration_data$()=""
+configuration_options%=0
+max_configuration_options%=options%
+configuration_app_name$=app_name$
+ENDPROC
+:
+:
+DEF PROCinit_num_config(item$,value)
+PROCinit_str_config(item$,STR$(value))
+ENDPROC
+:
+:
+DEF PROCinit_int_config(item$,value%)
+PROCinit_str_config(item$,STR$(value%))
+ENDPROC
+:
+:
+DEF PROCinit_opt_config(item$,state%)
+:
+LOCAL value$
+:
+IF state% THEN value$="On" ELSE value$="Off"
+PROCinit_str_config(item$,value$)
+ENDPROC
+:
+:
+DEF PROCinit_str_config(item$,value$)
+IF configuration_options%<max_configuration_options% THEN
+ configuration_data$(configuration_options%,0)=item$
+ configuration_data$(configuration_options%,1)=value$
+ configuration_data$(configuration_options%,2)=value$
+ configuration_options%+=1
+ELSE
+ ERROR 255,"Too many configuration options"
+ENDIF
+ENDPROC
+:
+:
+REM ================================================================================================
+:
+:
+DEF PROCset_num_config(item$,value)
+PROCset_str_config(item$,STR$(value))
+ENDPROC
+:
+:
+DEF PROCset_int_config(item$,value%)
+PROCset_str_config(item$,STR$(value%))
+ENDPROC
+:
+:
+DEF PROCset_opt_config(item$,value%)
+:
+LOCAL value$
+:
+IF value% THEN value$="On" ELSE value$="Off"
+PROCset_str_config(item$,value$)
+ENDPROC
+:
+:
+DEF PROCset_str_config(item$,value$)
+:
+LOCAL loop%
+:
+FOR loop%=0 TO configuration_options%-1
+ IF configuration_data$(loop%,0)=item$ THEN configuration_data$(loop%,2)=value$
+NEXT loop%
+ENDPROC
+:
+:
+REM ================================================================================================
+:
+:
+DEF PROCreset_default_config
+
+
+ENDPROC
+:
+:
+REM ================================================================================================
+:
+:
+DEF FNread_num_config(item$)
+=VAL(FNread_str_config(item$))
+:
+:
+DEF FNread_int_config(item$)
+=INT(VAL(FNread_str_config(item$)))
+:
+:
+DEF FNread_opt_config(item$)
+:
+LOCAL result%
+:
+CASE FNread_str_config(item$) OF
+ WHEN "Off" : result%=FALSE
+ WHEN "On"  : result%=TRUE
+ OTHERWISE  : ERROR 255,"Unrecognised option type"
+ENDCASE
+=result%
+:
+:
+DEF FNread_str_config(item$)
+:
+LOCAL loop%,result$
+:
+FOR loop%=0 TO configuration_options%-1
+ IF configuration_data$(loop%,0)=item$ THEN result$=configuration_data$(loop%,2)
+NEXT loop%
+=result$
+:
+:
+REM ================================================================================================
+:
+:
+DEF PROCsave_config_file(file$)
+:
+LOCAL file%,loop%,value$
+:
+file%=OPENOUT(file$)
+:
+BPUT#file%,"# >"+file$
+BPUT#file%,"#"
+BPUT#file%,"# Config file for "+configuration_app_name$
+BPUT#file%,"# Last automatically generated on "+TIME$
+BPUT#file%,""
+:
+FOR loop%=0 TO configuration_options%-1
+ IF configuration_data$(loop%,1)<>configuration_data$(loop%,2) THEN
+  value$=configuration_data$(loop%,2)
+  IF ASC(LEFT$(value$,1))<=32 OR ASC(RIGHT$(value$))<=32 THEN value$=""""+value$+""""
+  BPUT#file%,configuration_data$(loop%,0)+": "+value$
+ ENDIF
+NEXT loop%
+:
+CLOSE#file%
+SYS "OS_File",18,file$,&FFF
+ENDPROC
+:
+:
+DEF FNload_config_file(file$)
+:
+LOCAL file%,loop%,line$,option$,value$,bytes%
+:
+file%=OPENIN(file$)
+$a%=""
+:
+IF file%<>0 THEN
+ WHILE NOT EOF#file%
+  line$=GET$#file%
+  WHILE LEFT$(line$,1)=" "
+   line$=MID$(line$,2)
+  ENDWHILE
+  IF LEFT$(line$,1)<>"#" AND LEN(line$)>0 AND INSTR(line$,":")>0 THEN
+   option$=LEFT$(line$,INSTR(line$,":")-1)
+   FOR loop%=0 TO configuration_options%-1
+    IF configuration_data$(loop%,0)=option$ THEN
+     value$=MID$(line$,INSTR(line$,":")+1)
+     WHILE ASC(LEFT$(value$,1))<=32
+      value$=MID$(value$,2)
+     ENDWHILE
+     WHILE ASC(RIGHT$(value$))<=32
+      value$=LEFT$(value$)
+     ENDWHILE
+     IF LEFT$(value$,1)="""" AND RIGHT$(value$)="""" THEN value$=MID$(value$,2,LEN(value$)-2)
+     configuration_data$(loop%,2)=value$
+    ENDIF
+   NEXT loop%
+  ENDIF
+ ENDWHILE
+ :
+ SYS "OS_Args",7,file%,a%,,,256 TO ,,,,,bytes%
+ IF bytes%>=1 THEN a%?(256-bytes%)=13 ELSE $a%=""
+ :
+ CLOSE#file%
+ENDIF
+=$a%
+:
+:
+DEF PROCload_config_file(file$)
+:
+LOCAL dummy$
+:
+dummy$=FNload_config_file(file$)
+ENDPROC

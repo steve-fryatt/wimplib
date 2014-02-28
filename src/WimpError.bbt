@@ -1,0 +1,61 @@
+REM >WimpError
+REM
+REM Wimp error handling library
+REM (c) Stephen Fryatt, 2001
+REM
+REM Version 0.02 - 22 November 2002
+:
+DEF PROCwimp_error_initialise(task_name$,task_sprite$)
+:
+REM Initialise some global variables.
+:
+wimp_error_task_name$=task_name$
+wimp_error_task_sprite$=task_sprite$
+ENDPROC
+
+
+
+DEF PROCwimp_report(message$,type%,buttons%,buttons$)
+:
+LOCAL dummy%
+:
+dummy%=FNwimp_report(message$,type%,buttons%,buttons$)
+:
+ENDPROC
+
+
+
+DEF FNwimp_report(message$,type%,buttons%,buttons$)
+:
+LOCAL result%,flags%
+:
+flags%=&0100+((type% AND %111)<<9)+(buttons% AND %11)
+:
+!q%=255
+$(q%+4)=message$+CHR$(0)
+IF buttons$="" THEN
+ SYS "Wimp_ReportError",q%,flags%,wimp_error_task_name$,wimp_error_task_sprite$,1,0 TO ,result%
+ELSE
+ flags%=flags% AND (NOT %11)
+ SYS "Wimp_ReportError",q%,flags%,wimp_error_task_name$,wimp_error_task_sprite$,1,buttons$ TO ,result%
+ result%-=2
+ENDIF
+=result%
+
+
+
+
+DEF FNwimp_error
+:
+REM Report the last error using the standatr BASIC Wimp method.  If RISC OS 3.5+ is used, it is classified
+REM as a 'Program report'.
+:
+LOCAL result%
+:
+SYS "Hourglass_Smash"
+:
+!q%=ERR
+$(q%+4)=task_name$+" has suffered an internal error ("+REPORT$+"; error code "+STR$(ERL)+")"+CHR$(0)
+SYS "Wimp_ReportError",q%,&0703,wimp_error_task_name$,wimp_error_task_sprite$,1,0 TO ,result%
+:
+=result%

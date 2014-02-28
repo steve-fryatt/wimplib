@@ -1,0 +1,42 @@
+REM >BASIC:Date
+REM
+REM Date handling library
+REM (c) Stephen Fryatt, 2001
+REM
+REM Version 0.01 - 28 February 2001
+
+DEF FNconvert_date_to_ordinals(date$,ptr%)
+:
+REM Converts a date in the format dd/mm/yy[.hh.mm] to ordinals
+:
+LOCAL num_table%,loop%,char%,level%
+:
+SYS "Territory_CharacterPropertyTable",-1,6 TO num_table%
+:
+FOR loop%=1 TO LEN(date$)
+ char%=ASC(MID$(date$,loop%,1))
+ IF (num_table%!(char% DIV 8) AND (1<<(char% MOD 8)))=0 THEN MID$(date$,loop%,1)=" "
+NEXT loop%
+:
+level%=0 : REM Returning only day
+:
+ptr%!0=0 : REM Centisecs
+ptr%!4=0 : REM Seconds
+ptr%!16=VAL(date$)
+date$=MID$(date$,INSTR(date$,STR$(ptr%!16))+LEN(STR$(ptr%!16)))
+ptr%!20=VAL(date$)
+date$=MID$(date$,INSTR(date$,STR$(ptr%!20))+LEN(STR$(ptr%!20)))
+ptr%!24=VAL(date$)
+date$=MID$(date$,INSTR(date$,STR$(ptr%!24))+LEN(STR$(ptr%!24)))
+IF date$<>"" THEN
+ level%+=1
+ ptr%!12=VAL(date$)
+ date$=MID$(date$,INSTR(date$,STR$(ptr%!12))+LEN(STR$(ptr%!12)))
+ ptr%!8=VAL(date$)
+ date$=MID$(date$,INSTR(date$,STR$(ptr%!12))+LEN(STR$(ptr%!12)))
+ELSE
+ ptr%!8=0
+ ptr%!12=0
+ENDIF
+=level%
+

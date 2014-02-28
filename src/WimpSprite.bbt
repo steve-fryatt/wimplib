@@ -1,0 +1,65 @@
+REM >BASIC:WimpSprite
+REM
+REM Wimp Srpite handling library
+REM (c) Stephen Fryatt, 1999
+REM
+REM Version 0.01 - 28 February 1999
+
+
+
+
+DEF FNload_user_sprite_area(file_name$)
+:
+REM Version 0.01
+REM
+REM Loads a sprite file into a new area of memory.
+REM
+REM Use is made of the standard Wimp suffixes (22, 23, 24...) in an attempt to
+REM get the correct resoultion file.
+:
+LOCAL area%, size%, type%
+:
+SYS "OS_File",17,file_name$+FNwimp_sprite_suffix TO type%,,,,size%
+:
+IF type%=1 THEN
+ file_name$+=FNwimp_sprite_suffix
+ELSE
+ SYS "OS_File",17,file_name$ TO type%,,,,size%
+ENDIF
+:
+IF type%=1 THEN
+ size%+=4
+ DIM area% size%
+ !area%=size%
+ area%!8=16
+ SYS "OS_SpriteOp",&10A,area%,file_name$
+ELSE
+ area%=0
+ENDIF
+:
+=area%
+
+
+
+
+DEF FNwimp_sprite_suffix
+:
+REM Version 0.01
+REM
+REM Returns the correct suffix for sprite files in the current mode.
+REM
+REM This does the job of Wimp_ReadSysInfo 2 but gets it correct.
+:
+LOCAL suffix$, mode_flags%, y_eig%
+:
+suffix$=""
+:
+SYS "OS_ReadModeVariable",-1,0 TO ,,mode_flags%
+IF mode_flags% AND &10 THEN
+ suffix$="23"
+ELSE
+ SYS "OS_ReadModeVariable",-1,5 TO ,,y_eig%
+ IF y_eig%<2 THEN suffix$="22"
+ENDIF
+:
+=suffix$

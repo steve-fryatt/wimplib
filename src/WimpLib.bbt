@@ -1,0 +1,437 @@
+REM >WimpLib
+REM Library of Wimp Routines for Window, Icon, and Menu Handling
+REM (C) Stephen Fryatt, 1996
+:
+REM File Handling
+:
+DEF FNzero_string(p%)
+LOCAL a$
+WHILE ?p%<>0
+ a$+=CHR$(?p%):p%+=1
+ENDWHILE
+=a$
+:
+DEF FNleaf_name(f$)
+IF INSTR(f$,":") THEN f$=MID$(f$,INSTR(f$,":")+1)
+WHILE INSTR(f$,".")
+ f$=MID$(f$,INSTR(f$,".")+1)
+ENDWHILE
+=f$
+:
+DEF FNpath_name(f$)
+LOCAL p$
+WHILE INSTR(f$,".")
+ p$+=LEFT$(f$,INSTR(f$,".")-1)+"."
+ f$=MID$(f$,INSTR(f$,".")+1)
+ENDWHILE
+=LEFT$(p$)
+:
+DEF FNload_sprites(f$)
+LOCAL s%,t%,f%
+f%=OPENIN(f$) : s%=EXT#f% : CLOSE#f% : s%+=4
+DIM t% s% : !t%=s% : t%!8=16 : SYS "OS_SpriteOp",&10A,t%,f$
+=t%
+:
+REM Window Handling
+:
+DEF PROCopen_window(!q%)
+SYS "Wimp_GetWindowState",,q%
+q%!28=-1
+SYS "Wimp_OpenWindow",,q%
+ENDPROC
+:
+DEF PROCclose_window(!q%)
+SYS "Wimp_CloseWindow",,q%
+ENDPROC
+:
+DEF PROCopen_window_at(!q%,x%,y%)
+SYS "Wimp_GetWindowState",,q%
+q%!8=y%-(q%!16-q%!8)
+q%!12=x%+(q%!12-q%!4)
+q%!16=y%
+q%!4=x%
+SYS "Wimp_OpenWindow",,q%
+ENDPROC
+:
+DEF PROCopen_window_as_menu_at(w%,x%,y%)
+SYS"Wimp_CreateMenu",,w%,x%,y%
+ENDPROC
+:
+DEF PROCopen_window_centred_as_menu(!q%,x%,y%)
+SYS"Wimp_GetWindowState",,q%
+SYS"Wimp_CreateMenu",,w%,(x%-(q%!12-q%!4))/2,(y+(q%!16-q%!8))/2
+ENDPROC
+:
+DEF PROCopen_window_centred(!q%,x%,y%)
+LOCAL width%,height%
+SYS "Wimp_GetWindowState",,q%
+width%=(q%!12-q%!4)
+height%=(q%!16-q%!8)
+q%!4=x%-width%/2
+q%!8=y%-height%/2
+IF q%!8<96 THEN q%!8=96
+q%!12=q%!4+width%
+q%!16=q%!8+height%
+SYS "Wimp_OpenWindow",,q%
+ENDPROC
+:
+DEF PROCscroll_to_top(!q%)
+LOCAL c%
+SYS "Wimp_GetWindowState",,q%
+c%=((q%!32 AND 1<<16)=0)
+q%!24=0
+SYS "Wimp_OpenWindow",,q%
+IF c% THEN SYS "Wimp_CloseWindow",,q%
+ENDPROC
+:
+DEF PROCchange_window_background(RETURN w%,c%)
+!q%=w%
+SYS "Wimp_GetWindowInfo",,q%
+q%?39=c%
+SYS "Wimp_CreateWindow",,q%+4 TO w%
+SYS "Wimp_DeleteWindow",,q%
+IF (q%!32 AND (1<<16)) THEN : !q%=w% :SYS "Wimp_OpenWindow",,q%
+ENDPROC
+:
+DEF PROCforce_window_redraw(!q%)
+SYS "Wimp_GetWindowState",,q%
+SYS "Wimp_ForceRedraw",!q%,q%!20,(q%!24)-(q%!16-q%!8),(q%!20)+(q%!12-q%!4),q%!24
+SYS "Wimp_ForceRedraw",-1,q%!4,q%!16,q%!12+40,q%!16+40
+ENDPROC
+:
+DEF PROCforce_window_title_redraw(!q%)
+SYS "Wimp_GetWindowState",,q%
+SYS "Wimp_ForceRedraw",-1,q%!4,q%!16,q%!12+40,q%!16+40
+ENDPROC
+:
+DEF PROCset_window_y_extent(!q%,y%,m%)
+IF y%<m% THEN y%=m%
+SYS "Wimp_GetWindowInfo",,(q% OR 1)
+q%!48=q%!56-y%
+SYS "Wimp_SetExtent",!q%,q%+44
+ENDPROC
+:
+DEF FNtitle_indirection(!a%) : SYS "Wimp_GetWindowInfo",,(a% OR 1) : =a%!76
+:
+REM Template Handling
+:
+DEF PROCopen_templates(f$)
+SYS "Wimp_OpenTemplate",,f$
+DIM template_name% 12
+ENDPROC
+:
+DEF PROCload_template(n$,d%,RETURN i%,RETURN l%,f%)
+LOCAL n%
+$template_name%="            "
+$template_name%=n$
+SYS "Wimp_LoadTemplate",,d%,i%,i%+l%,f%,template_name%,0 TO ,,n%
+l%-=(n%-i%)
+i%=n%
+ENDPROC
+:
+DEF FNload_template_definition(n$,RETURN i%,RETURN l%,f%,s%)
+LOCAL n%,d%,e%
+$template_name%="            "
+$template_name%=n$
+SYS "Wimp_LoadTemplate",,0,,,,template_name% TO ,e%
+DIM d% e%
+$template_name%=n$
+SYS "Wimp_LoadTemplate",,d%,i%,i%+l%,f%,template_name%,0 TO ,,n%
+d%!64=s%
+l%-=(n%-i%)
+i%=n%
+=d%
+:
+DEF PROCclose_templates
+SYS "Wimp_CloseTemplate"
+ENDPROC
+:
+REM Interactive Help
+:
+DEF PROCsend_help(h$)
+q%!12=b%!8
+q%!16=&503
+$(q%+20)=h$+STRING$(4,CHR$(0))
+!q%=24+(LEN(h$) AND &FFFFFC)
+SYS "Wimp_SendMessage",17,q%,b%!4
+ENDPROC
+:
+REM Icon Handling
+:
+DEF PROCset_icon_state(!q%,q%!4,s%,h%,d%)
+LOCAL e%,c%
+IF s% THEN c%+=(1<<21) : e%+=(1<<21) ELSE c%+=(1<<21) : e%+=(0<<21)
+IF h% THEN c%+=(1<<22) : e%+=(1<<22) ELSE c%+=(1<<22) : e%+=(0<<22)
+IF d% THEN c%+=(1<<23) : e%+=(1<<23) ELSE c%+=(1<<23) : e%+=(0<<23)
+q%!8=e%
+q%!12=c%
+SYS "Wimp_SetIconState",,q%
+ENDPROC
+:
+DEF FNicon_selected(!q%,q%!4) : SYS "Wimp_GetIconState",,q% : =((q%!24 AND (1<<21))<>0)
+:
+DEF FNicon_shaded(!q%,q%!4) : SYS "Wimp_GetIconState",,q% : =((q%!24 AND (1<<22))<>0)
+:
+DEF FNicon_deleted(!q%,q%!4) : SYS "Wimp_GetIconState",,q% : =((q%!24 AND (1<<23))<>0)
+:
+DEF FNicon_indirection(!a%,a%!4) : SYS "Wimp_GetIconState",,a% : =a%!28
+:
+DEF FNicon_validation(!a%,a%!4) : SYS "Wimp_GetIconState",,a% : =a%!32
+:
+DEF PROCset_icon_colours(!q%,q%!4,f%,b%)
+LOCAL e%,c%
+q%!8=0 : q%!12=(255<<24)
+SYS "Wimp_SetIconState",,q%
+q%!8=(b%<<28)+(f%<<24)
+q%!12=q%!8
+SYS "Wimp_SetIconState",,q%
+ENDPROC
+:
+DEF FNget_icon_background_colour(!q%,q%!4)
+SYS "Wimp_GetIconState",,q%
+=((q%!24 AND %1111<<28)>>>28)
+:
+DEF FNget_icon_foreground_colour(!q%,q%!4)
+SYS "Wimp_GetIconState",,q%
+=((q%!24 AND %1111<<24)>>>24)
+:
+DEF FNcreate_standard_bar_icon(!q%,i$)
+LOCAL h%
+q%!4=0
+q%!8=0
+q%!12=68
+q%!16=69
+q%!20=&3002
+$(q%+24)=i$
+SYS "Wimp_CreateIcon",,q% TO h%
+=h%
+:
+DEF PROCincrement_icon_contents(w%,i%,l%)
+LOCAL v%
+v%=VAL($FNicon_indirection(w%,i%))
+v%+=1
+IF v%<=l% THEN $FNicon_indirection(w%,i%)=STR$(v%)
+PROCforce_icon_redraw(w%,i%)
+ENDPROC
+:
+DEF PROCdecrement_icon_contents(w%,i%,l%)
+LOCAL v%
+v%=VAL($FNicon_indirection(w%,i%))
+v%-=1
+IF v%>=l% THEN $FNicon_indirection(w%,i%)=STR$(v%)
+PROCforce_icon_redraw(w%,i%)
+ENDPROC
+:
+DEF PROCforce_icon_redraw(!q%,q%!4)
+SYS "Wimp_GetIconState",,q%
+SYS "Wimp_ForceRedraw",!q%,q%!8,q%!12,q%!16,q%!20
+ENDPROC
+:
+DEF PROCimmediate_icon_redraw(!q%,q%!4)
+LOCAL m%
+SYS "Wimp_GetIconState",,q%
+q%!4=!q%
+SYS "Wimp_UpdateWindow",,q%+4 TO m%
+WHILE m%
+ SYS "Wimp_GetRectangle",,q% TO m%
+ENDWHILE
+ENDPROC
+:
+REM Caret Handling
+:
+DEF PROCput_caret_at_end(!q%,q%!4)
+LOCAL l%
+IF q%!4>-1 THEN SYS "Wimp_GetIconState",,q% : l%=LEN($(q%!28)) ELSE l%=0
+SYS "Wimp_SetCaretPosition",!q%,q%!4,,,-1,l%
+ENDPROC
+:
+DEF FNis_caret_in_icon(w%,i%)
+SYS "Wimp_GetCaretPosition",,q%
+IF i%=-1 THEN q%!4=-1
+=((!q%=w%) AND (q%!4=i%))
+:
+REM Menu Handling
+:
+DEF PROCdisplay_menu(m%,x%,y%)
+menu_up%=m%
+SYS "Wimp_CreateMenu",,m%,x%-64,y%
+ENDPROC
+:
+DEF PROCdisplay_bar_menu(m%,i%,d%,x%)
+menu_up%=m%
+SYS "Wimp_CreateMenu",,m%,x%-64,96+(i%*44)+(d%*24)
+ENDPROC
+:
+DEF PROCdisplay_icon_menu(m%,w%,i%)
+!q%=w%
+SYS "Wimp_GetWindowState",,q%
+q%!100=w%
+q%!104=i%
+SYS "Wimp_GetIconState",,q%+100
+menu_up%=m%
+SYS "Wimp_CreateMenu",,m%,q%!4+(q%!116-q%!20),q%!16+(q%!120-q%!20)
+ENDPROC
+:
+DEF PROCset_standard_menu_title(m%,t$)
+$m%=t$:m%?12=7
+ENDPROC
+:
+DEF PROCset_standard_menu_text(m%,i%,t$)
+$((m%+28)+(24*i%)+12)=LEFT$(t$,11)
+ENDPROC
+:
+DEF FNget_standard_menu_text(m%,i%)
+=$((m%+28)+(24*i%)+12)
+:
+DEF PROCset_indirected_menu_text(m%,i%,t%,l%)
+!(m%+28+(i%*24)+12)=t%
+!(m%+28+(i%*24)+20)=l%
+ENDPROC
+:
+DEF FNmenu_indirection(menu%,item%)
+=!(menu%+28+(item%*24)+12)
+:
+DEF PROCset_menu_state(h%,i%,t%,s%)
+LOCAL a%
+a%=h%+28+(i%*24)+10
+IF s% THEN?a%=(?a% OR 64) ELSE ?a%=(?a% AND 191)
+a%=h%+28+(i%*24)
+IF t% THEN?a%=(?a% OR 1) ELSE ?a%=(?a% AND 254)
+ENDPROC
+:
+DEF PROCset_menu_end(h%,i%,e%)
+LOCAL a%
+a%=h%+28+(i%*24)
+IF e% THEN?a%=(?a% OR 128) ELSE ?a%=(?a% AND 127)
+ENDPROC
+:
+DEF PROCset_menu_width(h%,w%)
+h%!16=(w%+1)*16
+ENDPROC
+:
+REM Menu Creation
+:
+DEF PROCinit_new__menu(m%,RETURN w%,RETURN e%,t$)
+w%=LEN(t$):$m%=t$:m%?12=7:m%?13=2:m%?14=7:m%?15=0
+m%!16=(w%+1)*16:m%!20=44:m%!24=0:e%=m%+28
+ENDPROC
+:
+DEF PROCstandard_menu_item(m%,RETURN w%,RETURN e%,t$,t%,dt%,s%,wn%,lt%,li%)
+LOCAL f%,d%
+IF LEN(t$)<12 THEN
+ f%=FNstandard_menu_flags(s%)
+ PROCmenu_item(m%,w%,e%,t$,t%,dt%,lt%,li%,0,wn%,f%,0,0,0)
+ELSE
+ DIM d% LEN(t$)
+ $d%=t$
+ f%=FNmenu_flags(1,0,0,0,0,1,0,0,s%,7,0,0)
+ PROCmenu_item(m%,w%,e%,t$,t%,dt%,lt%,li%,0,wn%,f%,d%,-1,LEN(t$)+1)
+ENDIF
+ENDPROC
+:
+DEF FNmenu_flags(t%,sp%,br%,c%,an%,i%,r%,h%,sh%,fc%,bc%,ft%)
+LOCAL f%
+f%=t%+(sp%<<1)+(br%<<2)+(c%<<3)+(1<<5)+(an%<<6)+(i%<<8)+(r%<<9)+(h%<<11)+(sh%<<22)
+IF an%=0 THEN f%+=(fc%<<24)+(bc%<<28) ELSE f%+=(ft%<<24)
+=f%
+:
+DEF FNstandard_menu_flags(s%)
+=FNmenu_flags(1,0,0,0,0,0,0,0,s%,7,0,0)
+:
+DEF FNcolour_menu_flags(f%,b%)
+=FNmenu_flags(1,0,0,0,0,0,0,0,0,f%,b%,0)
+:
+DEF PROCmenu_item(m%,RETURN w%,RETURN e%,t$,t%,d%,lt%,wr%,me%,lk%,fl%,i1%,i2%,i3%)
+LOCAL f%,ist%
+f%=t%+(d%<<1)+(wr%<<2)+(me%<<3)+(lt%<<7)
+!e%=f%:e%!4=lk%:e%!8=fl%
+ist%=((fl%>>6)AND4)+(fl%AND3)
+CASE ist% OF
+WHEN 1,2,3:$(e%+12)=t$
+WHEN 5,6,7:e%!12=i1%:e%!16=i2%:e%!20=i3%
+ENDCASE
+e%+=24
+IF LEN(t$)>w% THENw%=LEN(t$)
+m%!16=(w%+1)*16
+ENDPROC
+:
+DEF PROCload_menu_block(f$, r%)
+LOCAL p%,y%,z%,l%,c%,t%
+SYS "OS_File",5,f$ TO ,,,,l%
+DIM p% l%
+SYS "OS_File",255,f$,p%
+c%=0
+IF !p%>-1 THEN
+ y%=(p%+!p%)
+ REPEAT
+  t%=!y% : !y%=r%!c% : c%+=4
+  IF t%>-1 THEN y%=p%+t%
+ UNTIL t%=-1
+ENDIF
+IF p%!4>-1 THEN
+ y%=p%+(p%!4)
+ WHILE !y%>-1
+  !(p%+!y%)=y%+4 : y%=(y%+(!(p%+!y%+8)+7)) AND (NOT 3)
+ ENDWHILE
+ENDIF
+IF p%!8>-1 THEN
+ y%=p%+(p%!8)
+ WHILE !y%>-1
+  !(p%+!y%)=y%+8 : y%=(y%+!(y%+4))
+ ENDWHILE
+ENDIF
+y%=p%+20 : c%=0
+REPEAT
+ r%!c%=y% : z%=y%-4
+ IF !z%>-1 THEN
+  t%=p%+(!z%)
+  WHILE t%>-1
+   z%=!t%
+   IF z%>-1 THEN z%+=p%
+   !t%=y% : t%=z%
+  ENDWHILE
+ ENDIF
+ y%=!(y%-8)
+ IF y%>-1 THEN y%+=p%
+ c%+=4
+UNTIL y%=-1
+ENDPROC
+:
+REM Error Handling
+:
+DEF PROCreport(m$,t$)
+!q%=255
+$(q%+4)=m$+CHR$(0)
+SYS "Wimp_ReportError",q%,%10001,"Message from "+t$
+ENDPROC
+:
+DEF PROCreport_fatal(m$,t$,f%)
+LOCAL l%
+IF f% l%=%10 ELSE l%=%10001 : t$="Message from "+t$
+!q%=255
+$(q%+4)=m$+CHR$(0)
+SYS "Wimp_ReportError",q%,l%,t$
+ENDPROC
+:
+DEF FNerror(t$)
+LOCAL c%
+SYS "Hourglass_Smash"
+!q%=ERR
+$(q%+4)=t$+" has suffered an internal error ("+REPORT$+"; error code "+STR$(ERL)+")"+CHR$(0)
+SYS "Wimp_ReportError",q%,%11,t$ TO ,c%
+=c%
+:
+REM Territory Manager
+:
+DEF FNterritory_name
+LOCAL t%
+SYS "Territory_Number" TO t%
+SYS "Territory_NumberToName",t%,q%,256
+=FNzero_string(q%)
+:
+DEF FNterritory_resources(p$)
+LOCAL f$,t%
+f$=p$+"."+FNterritory_name
+SYS "XOS_File",5,f$ TO t%
+IF t%<2 OR t%>3 THEN f$=p$+".UK"
+=f$+"."

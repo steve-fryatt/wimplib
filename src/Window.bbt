@@ -1,0 +1,11 @@
+REM >BASIC:Window
+REM
+REM Window handling library
+REM (c) Stephen Fryatt, 2001
+REM
+REM Version 0.01 - 25 March 2001
+
+DEF FNwindow_is_open(!a%)
+:
+SYS "Wimp_GetWindowState",,a%
+=(a%!32 AND &10000)=&10000

@@ -1,0 +1,125 @@
+REM >URL
+REM
+REM Launch urls from Wimp applications.
+REM (c) Stephen Fryatt, 2001
+REM
+REM Version 0.10 - 4 July 2003
+REM Based on the Nettle sources, but converted into BASIC.
+REM
+REM The following steps are taken in a url broadcast:
+REM  1) Try ANT broadcast
+REM  2) If that bounces, try Acorn URI dispatch [broadcast + load]
+REM  3) If that succeeds, wait for success or failure wimp message
+REM  4) If either fails, try ANT URL_Open
+REM  5) If that fails, give error message
+:
+:
+:
+:
+DEF PROClaunch_url(url$)
+:
+REM Launch an URL.
+:
+IF FNant_broadcast(url$) THEN PROCwimp_report(FNmessage_trans("URLFailed"),1,%01,"")
+ENDPROC
+:
+:
+:
+:
+REM --------------------------------------------------------------------------------------------------------------------
+:
+:
+:
+:
+DEF PROCurl_bounce(message%)
+:
+REM Generic handler to deal with the two Wimp Messages we care about.
+:
+LOCAL len%, result%
+:
+CASE message%!16 OF
+ WHEN &4E383 : REM Message_URIReturnResult
+  IF (message%!20 AND &01)<>0 THEN
+   SYS "URI_RequestURI",0,q%,255,message%!24 TO ,,len%
+   q%?len%=13
+   :
+   IF FNant_load($q%) THEN PROCwimp_report(FNmessage_trans("URLFailed"),1,%01,"")
+  ENDIF
+ WHEN &4AF80 : REM Message_ANTOpenURL
+  IF FNuri_dispatch(message%+20) THEN
+   IF FNant_load(FNctrl_string(message%+20)) THEN PROCwimp_report(FNmessage_trans("URLFailed"),1,%01,"")
+  ENDIF
+ENDCASE
+ENDPROC
+:
+:
+:
+:
+REM ====================================================================================================================
+:
+:
+:
+:
+DEF FNant_broadcast(url$)
+:
+REM Try the ANT Bradcast method and wait for a reply or a bounce.
+:
+LOCAL flags%
+:
+q%!0=((20+LEN(url$)+1)+3) AND (NOT 3)
+q%!12=0
+q%!16=&4AF80
+$(q%+20)=url$
+SYS "XWimp_SendMessage",18,q%,0 TO ;flags%
+:
+=(flags% AND 1)=1
+:
+:
+:
+:
+REM --------------------------------------------------------------------------------------------------------------------
+:
+:
+:
+:
+DEF FNuri_dispatch(url%)
+:
+REM Try to displatch the URL through the Acorn URI system.
+:
+LOCAL flags%, task%
+:
+SYS "XOS_SWINumberFromString",,"URI_Dispatch" TO ;flags%
+IF (flags% AND 1)=0 THEN
+ SYS "Wimp_ReadSysInfo",5 TO task%
+ SYS "XURI_Dispatch",1,url%,task% TO ;flags%
+ENDIF
+:
+=(flags% AND 1)=1
+:
+:
+:
+:
+REM --------------------------------------------------------------------------------------------------------------------
+:
+:
+:
+:
+DEF FNant_load(url$)
+:
+REM Try to launch a client using the ANT protocol.
+:
+LOCAL offset%, command$, result%
+:
+offset%=INSTR(url$,":")
+:
+command$="Alias$URLOpen_"+LEFT$(url$,offset%-1)
+:
+SYS "XOS_ReadVarVal",command$,0,-1,0,0 TO ,,result%
+IF result%=0 THEN =TRUE
+:
+command$+=" "+url$
+command$=MID$(command$,LEN("Alias$")+1)
+:
+SYS "XWimp_StartTask",command$ TO ;flags%
+:
+=(flags% AND 1)=1
