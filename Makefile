@@ -83,6 +83,7 @@ TOKENIZEFALSG :=
 
 # Set up the various build directories.
 
+SRCDIR := src
 MANUAL := manual
 OUTDIR := build
 LICENCE := Licence,fff
@@ -94,7 +95,7 @@ BASDIR := BASIC
 README := ReadMe,fff
 EXECUTABLES := mantools.pl,102 textman.pl,102 strongman.pl,102 htmlman.pl,102 ddfman.pl,102
 
-LIBRARIES := Config.bbt Date.bbt Icon.bbt Resources.bbt String.bbt URL.bbt WimpError.bbt WimpLib.bbt WimpSprite.bbt Window.bbt
+LIBRARIES := Config.bbt Date.bbt Icon.bbt Resources.bbt String.bbt Url.bbt WimpError.bbt WimpLib.bbt WimpSprite.bbt Window.bbt
 
 # Set up the source files.
 
@@ -109,10 +110,10 @@ all: libs documentation
 
 libs: $(addprefix $(OUTDIR)/$(BASDIR)/, $(LIBRARIES:.bbt=,ffb)) $(addprefix $(OUTDIR)/$(TXTDIR)/, $(LIBRARIES:.bbt=,fd1))
 
-$(OUTDIR)/$BASDIR/%,ffb: $(SRCDIR)/%.bbt
+$(OUTDIR)/$(BASDIR)/%,ffb: $(SRCDIR)/%.bbt
 	$(TOKENIZE) $(TOKFLAGS) $< -out $@
 
-$(OUTDIR)/$BASDIR/%,fd1: $(SRCDIR)/%.bbt
+$(OUTDIR)/$(TXTDIR)/%,fd1: $(SRCDIR)/%.bbt
 	$(CP) $< $@
 
 # Build the documentation
