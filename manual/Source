@@ -37,9 +37,9 @@ The source for <cite>WimpLib</cite> can be found alongside this binary download,
 
 <chapter title="Introduction and Use" file="Introduction">
 
-<cite>WimpLib</cite> is a set of BASIC libraries for use with RISC&nbsp;OS software. Supplied mainly to allow my other software to compile, they can also be used in their own right as part of software licensed under the EUPL or one of its &ldquo;compatible licences&rdquo; (such as the GPL&nbsp;v2).
+<cite>WimpLib</cite> is a set of BASIC libraries for use with RISC&nbsp;OS software. Supplied mainly to allow my other software to be built, they can also be used in their own right as part of software licensed under the EUPL or one of its &ldquo;compatible licences&rdquo; (such as the GPL&nbsp;v2).
 
-Two copies of the library are supplied: the <file>BASIC</file> folder contains standard tokenised BBC&nbsp;BASIC files, while <file>Text</file> contains untokenised &lsquo;BASICTxt&rsquo; files (type &FD1). It is the latter which will be required if building any of my software, as they are suitable for passing to <cite>Tokenize</cite>. 
+Two copies of the library files are supplied: the <file>BASIC</file> folder contains standard tokenised BBC&nbsp;BASIC files, while <file>Text</file> contains untokenised &lsquo;BASICTxt&rsquo; files (type &FD1). It is the latter which will be required if building any of my software, as they are suitable for passing to <cite>Tokenize</cite>. 
 
 Documentation for the libraries &ndash; such as it is &ndash; is provided within the header and source files. <cite>WimpLib</cite> is not in &lsquo;active&rsquo; development, and it may not always be possible to provide assistance in its use.
 
