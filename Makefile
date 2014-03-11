@@ -49,9 +49,9 @@ $(info Building with version $(VERSION) ($(RELEASE)) on date $(BUILD_DATE))
 # The archive to assemble the release files in.  If $(RELEASE) is set, then the file can be given
 # a standard version number suffix.
 
-ZIPFILE := mantools$(RELEASE).zip
-SRCZIPFILE := mantools$(RELEASE)src.zip
-BUZIPFILE := mantools$(shell date "+%Y%m%d").zip
+ZIPFILE := wimplib$(RELEASE).zip
+SRCZIPFILE := wimplib$(RELEASE)src.zip
+BUZIPFILE := wimplib$(shell date "+%Y%m%d").zip
 
 
 # Build Tools
@@ -63,6 +63,7 @@ CP := cp
 ZIP := /home/steve/GCCSDK/env/bin/zip
 
 SFBIN := /home/steve/GCCSDK/sfbin
+BASIC := /home/steve/GCCSDK/basic
 
 MANTOOLS := $(SFBIN)/mantools
 BINDHELP := $(SFBIN)/bindhelp
@@ -93,8 +94,6 @@ BASDIR := BASIC
 # Set up the named target files.
 
 README := ReadMe,fff
-EXECUTABLES := mantools.pl,102 textman.pl,102 strongman.pl,102 htmlman.pl,102 ddfman.pl,102
-
 LIBRARIES := Config.bbt Date.bbt Icon.bbt Resources.bbt String.bbt Url.bbt WimpError.bbt WimpLib.bbt WimpSprite.bbt Window.bbt
 
 # Set up the source files.
@@ -128,9 +127,9 @@ $(OUTDIR)/$(README): $(MANUAL)/$(MANSRC)
 
 release: clean all
 	$(RM) ../$(ZIPFILE)
-	(cd $(OUTDIR) ; $(ZIP) $(ZIPFLAGS) ../../$(ZIPFILE) $(README) $(LICENCE) $(EXECUTABLES))
+	(cd $(OUTDIR) ; $(ZIP) $(ZIPFLAGS) ../../$(ZIPFILE) $(README) $(LICENCE) $(TXTDIR) $(BASDIR))
 	$(RM) ../$(SRCZIPFILE)
-	$(ZIP) $(SRCZIPFLAGS) ../$(SRCZIPFILE) $(OUTDIR) $(MANUAL) Makefile
+	$(ZIP) $(SRCZIPFLAGS) ../$(SRCZIPFILE) $(SRCDIR) $(OUTDIR) $(MANUAL) Makefile
 
 
 # Build a backup Zip file
@@ -145,10 +144,12 @@ backup:
 # of the RISC OS target.
 
 install: clean all
-	for f in $(EXECUTABLES); do $(CP) $(OUTDIR)/$$f $(SFBIN)/$${f%$(SUFFIX)}; done
+	for f in $(LIBRARIES); do $(CP) $(SRCDIR)/$$f $(BASIC)/$${f%.bbt}; done
 
 
 # Clean targets
 
 clean:
 	$(RM) $(OUTDIR)/$(README)
+	$(RM) $(OUTDIR)/$(TXTDIR)/*
+	$(RM) $(OUTDIR)/$(BASDIR)/*
