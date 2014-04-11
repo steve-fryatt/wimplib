@@ -79,7 +79,7 @@ SRCZIPFLAGS := -x "*/.svn/*" -r -9
 BUZIPFLAGS := -x "*/.svn/*" -r -9
 BINDHELPFLAGS := -f -r -v
 MENUGENFLAGS := -d
-TOKENIZEFALSG :=
+TOKFLAGS :=
 
 
 # Set up the various build directories.
