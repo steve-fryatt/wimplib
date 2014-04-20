@@ -60,16 +60,13 @@ MKDIR := mkdir
 RM := rm -rf
 CP := cp
 
-ZIP := /home/steve/GCCSDK/env/bin/zip
+ZIP := $(GCCSDK_INSTALL_ENV)/bin/zip
 
-SFBIN := /home/steve/GCCSDK/sfbin
-BASIC := /home/steve/GCCSDK/basic
-
-MANTOOLS := $(SFBIN)/mantools
-BINDHELP := $(SFBIN)/bindhelp
-TEXTMERGE := $(SFBIN)/textmerge
-MENUGEN := $(SFBIN)/menugen
-TOKENIZE := $(SFBIN)/tokenize
+MANTOOLS := $(SFTOOLS_BIN)/mantools
+BINDHELP := $(SFTOOLS_BIN)/bindhelp
+TEXTMERGE := $(SFTOOLS_BIN)/textmerge
+MENUGEN := $(SFTOOLS_BIN)/menugen
+TOKENIZE := $(SFTOOLS_BIN)/tokenize
 
 
 # Build Flags
@@ -144,7 +141,7 @@ backup:
 # of the RISC OS target.
 
 install: clean all
-	for f in $(LIBRARIES); do $(CP) $(SRCDIR)/$$f $(BASIC)/$${f%.bbt}; done
+	for f in $(LIBRARIES); do $(CP) $(SRCDIR)/$$f $(SFTOOLS_BASIC)/$${f%.bbt}; done
 
 
 # Clean targets
