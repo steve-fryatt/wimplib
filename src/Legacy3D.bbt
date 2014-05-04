@@ -1,0 +1,58 @@
+REM Library - 3D Icons
+:
+DEF PROC3D_init
+DIM D_val1% 2  : $D_val1%="R1"
+DIM D_val2% 2  : $D_val2%="R2"
+DIM D_val3% 2  : $D_val3%="R3"
+DIM D_val4% 2  : $D_val4%="R4"
+DIM D_val5% 2  : $D_val5%="R5"
+DIM D_val6% 2  : $D_val6%="R6"
+DIM D_val7% 2  : $D_val7%="R7"
+DIM D_null% 1  : $D_null%=" "
+ENDPROC
+:
+DEF FN3D_out(wh%,x%,y%,w%,h%,text%,textlen%)
+icon%=FNcreate_icon(wh%,x%*4,y%*4,w%*4,h%*4,"",text%,D_val1%,textlen%,1,0,1,1,1,1,1,0,3,1,0,0,0,7,1)
+=icon%
+:
+:
+DEF FN3D_in(wh%,x%,y%,w%,h%,text%,textlen%)
+icon%=FNcreate_icon(wh%,x%*4,y%*4,w%*4,h%*4,"",text%,D_val2%,textlen%,1,0,1,1,1,1,1,0,3,1,0,0,0,7,1)
+=icon%
+:
+DEF FN3D_border_out(wh%,x%,y%,w%,h%)
+icon%=FNcreate_icon(wh%,x%*4,y%*4,w%*4,h%*4,"",D_null%,D_val3%,2,1,0,1,1,1,0,1,0,3,1,0,0,0,7,1)
+=icon%
+:
+DEF FN3D_border_in(wh%,x%,y%,w%,h%)
+icon%=FNcreate_icon(wh%,x%*4,y%*4,w%*4,h%*4,"",D_null%,D_val4%,2,1,0,1,1,1,1,1,0,3,1,0,0,0,7,1)
+=icon%
+:
+DEF FN3D_action(wh%,x%,y%,w%,h%,text$)
+LOCAL ind%
+DIM ind% LEN(text$)
+$ind%=text$
+icon%=FNcreate_icon(wh%,x%*4,y%*4,w%*4,h%*4,"",ind%,D_val5%,LEN(text$)+1,1,0,1,1,1,1,1,0,3,1,0,0,0,7,1)
+=icon%
+:
+DEF FN3D_default(wh%,x%,y%,w%,h%,text$)
+LOCAL ind%
+DIM ind% LEN(text$)
+$ind%=text$
+icon%=FNcreate_icon(wh%,x%*4-8,y%*4-8,w%*4+16,h%*4+16,"",ind%,D_val6%,LEN(text$)+1,1,0,1,1,1,1,1,0,3,1,0,0,0,7,1)
+=icon%
+:
+DEF FN3D_writeable(wh%,x%,y%,w%,h%,text%,textlen%)
+icon%=FNcreate_icon(wh%,x%*4-8,y%*4-8,w%*4+16,h%*4+16,"",text%,D_val7%,textlen%,1,0,1,1,1,1,1,0,15,1,0,0,0,7,0)
+=icon%
+ENDPROC
+:
+DEF PROC3D_border_name(wh%,x%,y%,w%,h%,text$)
+LOCAL width%,ind%
+DIM ind% LEN(text$)
+width%=LEN(text$)*4+4
+$ind%=text$
+icon%=FN3D_out(wh%,x%+4,y%+h%-7,width%,12,D_null%,2)
+icon%=FN3D_border_out(wh%,x%,y%,w%,h%)
+icon%=FNcreate_icon(wh%,x%*4+20,y%*4+h%*4-24,width%*4-8,40,"",ind%,-1,LEN(text$)+1,1,0,0,1,1,1,1,0,0,0,0,0,0,7,1)
+ENDPROC

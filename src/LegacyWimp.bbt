@@ -1,0 +1,454 @@
+REM >WimpLib - Wimp Library ***RISC OS 3.10 ONLY***
+:
+DEF FNreport(errno%,err$,error%,task$,ok%,cancel%)
+LOCAL flag%,response%
+!safeblock%=errno%
+$(safeblock%+4)=err$+CHR$(0)
+flag%=ok%+(cancel%<<1)+(error%<<4)
+IF error%=1 task$="Message from "+task$
+SYS "Wimp_ReportError",safeblock%,flag%,task$ TO ,response%
+=response%
+:
+DEF FNcreate_window(x%,y%,w%,h%,extx%,exty%,title$,help%,tb%,bi%,ci%,si%,ai%,vs%,hs%,ind%,ptr1%,ptr2%,ptr3%,sp%,bg%)
+LOCAL flag%,tbar%
+tbar%=&19
+tbar%+=(ind%<<8)
+:
+flag%=(1<<31)
+flag%+=(1<<1)
+flag%+=(help%<<4)
+flag%+=(1<<12)
+:
+flag%+=(tb%<<26)
+flag%+=(bi%<<24)
+flag%+=(ci%<<25)
+flag%+=(si%<<27)
+flag%+=(ai%<<29)
+flag%+=(vs%<<28)
+flag%+=(hs%<<30)
+:
+!safeblock%=x%
+safeblock%!4=y%
+safeblock%!8=x%+w%
+safeblock%!12=y%+h%
+:
+safeblock%!16=0
+safeblock%!20=0
+:
+safeblock%!24=-1
+safeblock%!28=flag%
+:
+safeblock%?32=7
+safeblock%?33=2
+safeblock%?34=7
+safeblock%?35=bg%
+safeblock%?36=3
+safeblock%?37=1
+safeblock%?38=12
+:
+safeblock%!40=0
+safeblock%!44=-h%-exty%
+safeblock%!48=w%+extx%
+safeblock%!52=0
+:
+safeblock%!56=tbar%
+safeblock%!60=3<<12
+:
+safeblock%!64=sp%
+safeblock%!68=80
+:
+IF ptr1%=0 THEN
+$(safeblock%+72)=title$
+ELSE
+safeblock%!72=ptr1%
+safeblock%!76=ptr2%
+safeblock%!80=ptr3%
+ENDIF
+:
+safeblock%!84=0
+:
+SYS "Wimp_CreateWindow",,safeblock% TO handle%
+=handle%
+:
+DEF FNwindow(x%,y%,w%,h%,extx%,exty%,flag%,title$)
+!safeblock%=x%
+safeblock%!4=y%
+safeblock%!8=x%+w%
+safeblock%!12=y%+h%
+:
+safeblock%!16=0
+safeblock%!20=0
+:
+safeblock%!24=-1
+safeblock%!28=flag%
+:
+safeblock%?32=7
+safeblock%?33=2
+safeblock%?34=7
+safeblock%?35=1
+safeblock%?36=3
+safeblock%?37=1
+safeblock%?38=2
+:
+safeblock%!40=0
+safeblock%!44=-h%-exty%
+safeblock%!48=w%+extx%
+safeblock%!52=0
+:
+safeblock%!56=&19
+safeblock%!60=3<<12
+:
+safeblock%!64=1
+safeblock%!68=0
+:
+$(safeblock%+72)=title$
+safeblock%!84=0
+:
+SYS "Wimp_CreateWindow",,safeblock% TO handle%
+=handle%
+:
+DEF PROCopen_window(whan%)
+!safeblock%=whan%
+SYS "Wimp_GetWindowState",,safeblock%
+SYS "Wimp_OpenWindow",,safeblock%
+ENDPROC
+:
+DEF PROCopen_at(whan%,x%,y%)
+LOCAL w%,h%
+!safeblock%=whan%
+SYS "Wimp_GetWindowState",,safeblock%
+w%=safeblock%!12-safeblock%!4
+h%=safeblock%!16-safeblock%!8
+safeblock%!4=x%
+safeblock%!8=y%
+safeblock%!12=x%+w%
+safeblock%!16=y%+h%
+SYS "Wimp_OpenWindow",,safeblock%
+ENDPROC
+:
+DEF PROCclose_window(whan%)
+!safeblock%=whan%
+SYS "Wimp_GetWindowState",,safeblock%
+SYS "Wimp_CloseWindow",,safeblock%
+ENDPROC
+:
+DEF FNicon_bar(task$)
+!safeblock%=-1
+safeblock%!4=0
+safeblock%!8=0
+safeblock%!12=68
+safeblock%!16=69
+safeblock%!20=&3002
+$(safeblock%+24)=task$
+:
+SYS "Wimp_CreateIcon",,safeblock% TO ihandle%
+=ihandle%
+:
+DEF FNcreate_icon(whan%,ix%,iy%,iw%,ih%,text$,ptr1%,ptr2%,ptr3%,t%,s%,b%,ch%,cv%,f%,ind%,rj%,bt%,esg%,sel%,shad%,del%,fc%,bc%)
+LOCAL flag%
+flag%=t%<<0
+flag%+=s%<<1
+flag%+=b%<<2
+flag%+=ch%<<3
+flag%+=cv%<<4
+flag%+=f%<<5
+flag%+=ind%<<8
+flag%+=rj%<<9
+flag%+=bt%<<12
+flag%+=esg%<<16
+flag%+=sel%<<21
+flag%+=shad%<<22
+flag%+=del%<<23
+flag%+=fc%<<24
+flag%+=bc%<<28
+!safeblock%=whan%
+safeblock%!4=ix%
+safeblock%!8=iy%
+safeblock%!12=ix%+iw%
+safeblock%!16=iy%+ih%
+safeblock%!20=flag%
+IF ptr1%=0 THEN
+$(safeblock%+24)=text$
+ELSE
+safeblock%!24=ptr1%
+safeblock%!28=ptr2%
+safeblock%!32=ptr3%
+ENDIF
+:
+SYS "Wimp_CreateIcon",,safeblock% TO ihandle%
+=ihandle%
+:
+DEF FNicon(whan%,ix%,iy%,iw%,ih%,flag%,text$,ptr1%,ptr2%,ptr3%)
+!safeblock%=whan%
+safeblock%!4=ix%
+safeblock%!8=iy%
+safeblock%!12=ix%+iw%
+safeblock%!16=iy%+ih%
+safeblock%!20=flag%
+IF ptr1%=0 THEN
+$(safeblock%+24)=text$
+ELSE
+safeblock%!24=ptr1%
+safeblock%!28=ptr2%
+safeblock%!32=ptr3%
+ENDIF
+ENDIF
+:
+SYS "Wimp_CreateIcon",,safeblock% TO ihandle%
+=ihandle%
+:
+DEF FNoutline_icon(whan%,ix%,iy%,iw%,ih%,text$,ptr1%,ptr2%,ptr3%,t%,s%,b%,ch%,cv%,f%,ind%,rj%,bt%,esg%,sel%,shad%,del%,font%)
+LOCAL flag%
+flag%=t%<<0
+flag%+=s%<<1
+flag%+=b%<<2
+flag%+=ch%<<3
+flag%+=cv%<<4
+flag%+=f%<<5
+flag%+=1<<6
+flag%+=ind%<<8
+flag%+=rj%<<9
+flag%+=bt%<<12
+flag%+=esg%<<16
+flag%+=sel%<<21
+flag%+=shad%<<22
+flag%+=del%<<23
+flag%+=font%<<24
+!safeblock%=whan%
+safeblock%!4=ix%
+safeblock%!8=iy%
+safeblock%!12=ix%+iw%
+safeblock%!16=iy%+ih%
+safeblock%!20=flag%
+IF ptr1%=0 THEN
+$(safeblock%+24)=text$
+ELSE
+safeblock%!24=ptr1%
+safeblock%!28=ptr2%
+safeblock%!32=ptr3%
+ENDIF
+:
+SYS "Wimp_CreateIcon",,safeblock% TO ihandle%
+=ihandle%
+:
+DEF FNoutline_not(wh%,x%,y%,w%,h%,text%,textlen%,font%)
+icon%=FNoutline_icon(wh%,x%*4,y%*4,w%*4,h%*4,"",text%,-1,textlen%,1,0,0,1,1,0,1,0,3,1,0,0,0,font%)
+=icon%
+:
+DEF FNoutline(wh%,x%,y%,w%,h%,text%,textlen%,font%)
+icon%=FNoutline_icon(wh%,x%*4,y%*4,w%*4,h%*4,"",text%,-1,textlen%,1,0,1,1,1,1,1,0,3,1,0,0,0,font%)
+=icon%
+:
+DEF FNstring(ptr%)
+LOCAL a$
+WHILE ?ptr%<>0
+a$+=CHR$(?ptr%):ptr%+=1
+ENDWHILE
+=a$
+:
+DEF PROCinit_menu(menu%,RETURN width%,RETURN end%,title$)
+width%=LEN(title$)
+$menu%=title$:menu%?12=7
+menu%?13=2:menu%?14=7:menu%?15=0
+menu%!16=(width%+1)*16:menu%!20=44
+menu%!24=0:end%=menu%+28
+ENDPROC
+:
+DEF PROCst_menu_item(menu%,RETURN width%,RETURN end%,text$,tick%,dot%,shade%,last%,link%)
+LOCAL f%
+f%=FNst_menu_flags(shade%)
+PROCmenu_item(menu%,width%,end%,text$,tick%,dot%,shade%,last%,link%,write%,mess%,f%,0,0,0)
+ENDPROC
+:
+DEF PROCmenu_item(menu%,RETURN width%,RETURN end%,text$,tick%,dot%,shade%,last%,link%,write%,mess%,flag%,icon1%,icon2%,icon3%)
+LOCAL f%,ist%
+f%=tick%+(dot%<<1)+(write%<<2)+(mess%<<3)+(last%<<7)
+!end%=f%:end%!4=link%:end%!8=flag%
+ist%=((flag%>>6)AND4)+(flag%AND3)
+CASE ist% OF
+ WHEN 1,2,3:$(end%+12)=text$
+ WHEN 5,6,7:end%!12=icon1%:end%!16=icon2%:end%!20=icon3%
+ENDCASE
+end%+=24
+IF LEN(text$)>width% THEN width%=LEN(text$)
+menu%!16=(width%+1)*16
+ENDPROC
+:
+DEF FNmenu_flags(text%,sp%,bor%,chor%,anti%,ind%,rjust%,half%,shade%,fcol%,bcol%,font%)
+LOCAL flag%
+flag%=text%+(sp%<<1)+(bor%<<2)+(chor%<<3)+(1<<5)+(anti%<<6)+(ind%<<8)+(rjust%<<9)+(half%<<11)+(shade%<<22)
+IF anti%=0 THEN
+ flag%+=(fcol%<<24)+(bcol%<<28)
+ELSE
+ flag%+=(font%<<24)
+ENDIF
+=flag%
+:
+DEF FNst_menu_flags(shade%)
+=FNmenu_flags(1,0,0,0,0,0,0,0,shade%,7,0,0)
+:
+DEF PROCdisplay_bar_menu(menu%,items%,dots%,x%)
+menuup%=menu%
+SYS "Wimp_CreateMenu",,menu%,x%-64,96+(items%*44)+(dots%*24)
+ENDPROC
+:
+DEF PROCdisplay_menu(menu%,x%,y%)
+menuup%=menu%
+SYS "Wimp_CreateMenu",,menu%,x%-64,y%
+ENDPROC
+:
+DEF FNcreate_savebox(file%,spr%)
+LOCAL whand%,a%,sbval%
+DIM sbval% 3
+$sbval%="A~ "
+whand%=FNcreate_dialogue(264,164,"Save as:")
+a%=FNicon(whand%,100,-92,68,68,&6102,"",spr%,1,9)
+a%=FNicon(whand%,8,-156,192,48,&700F12D,"",file%,sbval%,256)
+a%=FNicon(whand%,208,-156,48,48,&C701903D,"OK",0,0,0)
+=whand%
+:
+DEF FNcreate_dialogue(w%,h%,t$)
+whand%=FNwindow((width%/2)-(w%/2),540-(h%/2),w%,h%,0,0,&84000012,t$)
+=whand%
+:
+DEF PROCstart_save(len%,type%,text%)
+IF drag_stop%<>-1 SYS drag_stop%
+SYS "Wimp_GetPointerInfo",,safeblock%
+safeblock%!20=safeblock%!12
+safeblock%!24=safeblock%!16
+safeblock%!28=!safeblock%
+safeblock%!32=safeblock%!4
+safeblock%!36=len%
+!safeblock%=64
+safeblock%!12=0
+safeblock%!16=1
+safeblock%!40=type%
+$(safeblock%+44)=FNgetleaf($text%)
+SYS "Wimp_SendMessage",18,safeblock%,safeblock%!20,safeblock%!24
+ENDPROC
+:
+DEF FNgetleaf(a$)
+WHILE INSTR(a$,".")
+a$=MID$(a$,INSTR(a$,".")+1)
+ENDWHILE
+=a$+CHR$0
+:
+DEF PROCdrag_box(whan%)
+LOCAL ox%,oy%,spr$
+!safeblock%=whan%
+SYS "Wimp_GetWindowState",,safeblock%
+ox%=safeblock%!4-safeblock%!20
+oy%=safeblock%!16-safeblock%!24
+safeblock%!4=0
+SYS "Wimp_GetIconState",,safeblock%
+spr$=$(safeblock%!28)
+safeblock%!4=5
+safeblock%!8=ox%+safeblock%!8
+safeblock%!12=oy%+safeblock%!12
+safeblock%!16=ox%+safeblock%!16
+safeblock%!20=oy%+safeblock%!20
+safeblock%!24=0
+safeblock%!28=0
+safeblock%!32=&7FFFFFFF
+safeblock%!36=&7FFFFFFF
+IF drag_start%=-1 THEN
+SYS "Wimp_DragBox",,safeblock%
+ELSE
+ SYS drag_start%,%11000101,1,spr$,safeblock%+8,safeblock%+24
+ENDIF
+ENDPROC
+:
+DEF PROCset_icon_state(whan%,ihan%,sel%,shad%,del%)
+LOCAL eor%,clear%
+eor%=0 : clear%=0
+IF sel% THEN
+clear%+=(1<<21)
+eor%  +=(1<<21)
+ELSE
+clear%+=(1<<21)
+eor%  +=(0<<21)
+ENDIF
+IF shad% THEN
+clear%+=(1<<22)
+eor%  +=(1<<22)
+ELSE
+clear%+=(1<<22)
+eor%  +=(0<<22)
+ENDIF
+IF del% THEN
+clear%+=(1<<23)
+eor%  +=(1<<23)
+ELSE
+clear%+=(1<<23)
+eor%  +=(0<<23)
+:
+!safeblock%=whan%
+safeblock%!4=ihan%
+safeblock%!8=eor%
+safeblock%!12=clear%
+SYS "Wimp_SetIconState",,safeblock%
+ENDPROC
+:
+DEF FNicon_state(whan%,icon%)
+!safeblock%=whan%
+safeblock%!4=icon%
+SYS "Wimp_GetIconState",,safeblock%
+=(safeblock%!24 AND (1<<21))
+:
+DEF FNinfo_window(name%,desc%,auth%,vers%,len%)
+LOCAL title%,icon%,whan%,
+DIM title% 18 : $title%="About this program"
+len%+=1
+whan%=FNcreate_window(0,0,680,212,0,0,"",1,1,0,0,0,0,0,0,1,title%,-1,19,1,1)
+icon%=FNcreate_icon(whan%,0,-52,144,48,"Name:",0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,0,-104,144,48,"Purpose:",0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,0,-156,144,48,"Author:",0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,0,-208,144,48,"Version:",0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,148,-52,528,48,"",name%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,148,-104,528,48,"",desc%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,148,-156,528,48,"",auth%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,148,-208,528,48,"",vers%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
+=whan%
+:
+DEF PROCset_menu_state(handle%,item%,tick%,shade%)
+LOCAL a%
+a%=handle%+28+(item%*24)+10
+IF shade% THEN ?a%=(?a% OR 64) ELSE ?a%=(?a% AND 191)
+a%=handle%+28+(item%*24)
+IF tick% THEN ?a%=(?a% OR 1) ELSE ?a%=(?a% AND 254)
+ENDPROC
+:
+DEF FNmenu_state(handle%,item%)
+LOCAL a%
+a%=handle%+28+(item%*24)
+=(?a% AND 1)
+:
+DEF PROCredraw_window(whand%)
+!safeblock%=whand%
+SYS "Wimp_GetWindowState",,safeblock%
+SYS "Wimp_ForceRedraw",whand%,safeblock%!20,(safeblock%!24)-(safeblock%!16-safeblock%!8),(safeblock%!20)+(safeblock%!12-safeblock%!4),safeblock%!24
+SYS "Wimp_ForceRedraw",-1,safeblock%!4,safeblock%!16,safeblock%!12+40,safeblock%!16+40
+ENDPROC
+:
+DEF PROCset_icon_colour(whand%,ihand%,fcol%,bcol%)
+LOCAL eor%,clear%
+eor%=0
+clear%=(255<<24)
+!safeblock%=whand%
+safeblock%!4=ihand%
+safeblock%!8=eor%
+safeblock%!12=clear%
+SYS "Wimp_SetIconState",,safeblock%
+eor%=0
+clear%=0
+eor%+=(bcol%<<28)
+eor%+=(fcol%<<24)
+clear%=eor%
+safeblock%!8=eor%
+safeblock%!12=clear%
+SYS "Wimp_SetIconState",,safeblock%
+ENDPROC
+:
+DEF PROCredraw_part(h%,x%,y%,a%,b%)
+SYS "Wimp_ForceRedraw",h%,x%,y%,x%+a%,y%+b%
+ENDPROC
