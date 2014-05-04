@@ -1,4 +1,29 @@
-REM Library - 3D Icons
+REM >BASIC:Legacy3D
+REM
+REM Copyright 1992-2014, Stephen Fryatt (info@stevefryatt.org.uk)
+REM
+REM This file is part of WimpLib:
+REM
+REM   http://www.stevefryatt.org.uk/software/
+REM
+REM Licensed under the EUPL, Version 1.1 only (the "Licence");
+REM You may not use this work except in compliance with the
+REM Licence.
+REM
+REM You may obtain a copy of the Licence at:
+REM
+REM   http://joinup.ec.europa.eu/software/page/eupl
+REM
+REM Unless required by applicable law or agreed to in
+REM writing, software distributed under the Licence is
+REM distributed on an "AS IS" basis, WITHOUT WARRANTIES
+REM OR CONDITIONS OF ANY KIND, either express or implied.
+REM
+REM See the Licence for the specific language governing
+REM permissions and limitations under the Licence.
+REM
+REM
+REM Legacy 3D Icon Support Library
 :
 DEF PROC3D_init
 DIM D_val1% 2  : $D_val1%="R1"
