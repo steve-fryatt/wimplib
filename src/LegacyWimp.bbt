@@ -333,7 +333,7 @@ a%=FNicon(whand%,208,-156,48,48,&C701903D,"OK",0,0,0)
 =whand%
 :
 DEF FNcreate_dialogue(w%,h%,t$)
-whand%=FNwindow((width%/2)-(w%/2),540-(h%/2),w%,h%,0,0,&84000012,t$)
+whand%=FNwindow(640-(w%/2),540-(h%/2),w%,h%,0,0,&84000012,t$)
 =whand%
 :
 DEF PROCstart_save(len%,type%,text%)
