@@ -31,3 +31,29 @@ DEF FNwindow_is_open(!a%)
 :
 SYS "Wimp_GetWindowState",,a%
 =(a%!32 AND &10000)=&10000
+
+
+DEF PROCwindow_open_nested(!a%, parent%)
+:
+SYS "Wimp_GetWindowState",,a%
+a%!28 = -1
+SYS "Wimp_OpenWindow",,a%, &4B534154, parent%, &0
+ENDPROC
+
+
+DEF PROCwindow_open_nested_in_icon(!a%, parent%, icon%, margin%, behind%)
+:
+a%!100 = parent%
+SYS "Wimp_GetWindowState",, a% + 100
+a%!200 = parent%
+a%!204 = icon%
+SYS "Wimp_GetIconState",, a% + 200
+SYS "Wimp_GetWindowState",, a%
+a%!4 = a%!104 - a%!120 + a%!208 + 8
+a%!8 = a%!116 - a%!124 + a%!212 + 8
+a%!12 = a%!104 - a%!120 + a%!216 - 8 - margin%
+a%!16 = a%!116 - a%!120 + a%!220 - 8
+a%!28 = -1
+SYS "Wimp_OpenWindow",,a%, &4B534154, parent%, &0
+ENDPROC
+
