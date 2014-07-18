@@ -147,3 +147,18 @@ a%!28 = -1
 SYS "Wimp_OpenWindow",,a%, &4B534154, parent%, &0
 ENDPROC
 
+
+REM Force the redraw of the visible area of an open window, plus the window's
+REM title bar
+REM
+REM \param window%		The handle of the window to redraw.
+:
+DEF PROCwindow_force_redraw(!a%)
+SYS "Wimp_GetWindowState",,a%
+SYS "Wimp_ForceRedraw",!a%,a%!20,(a%!24)-(a%!16-a%!8),(a%!20)+(a%!12-a%!4),a%!24
+SYS "Wimp_ForceRedraw",-1,a%!4,a%!16,a%!12+40,a%!16+40
+ENDPROC
+
+
+
+

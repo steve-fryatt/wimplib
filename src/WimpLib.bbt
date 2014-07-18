@@ -104,6 +104,7 @@ q%!16=q%!8+height%
 SYS "Wimp_OpenWindow",,q%
 ENDPROC
 :
+REM Not transferred
 DEF PROCscroll_to_top(!q%)
 LOCAL c%
 SYS "Wimp_GetWindowState",,q%
@@ -113,6 +114,7 @@ SYS "Wimp_OpenWindow",,q%
 IF c% THEN SYS "Wimp_CloseWindow",,q%
 ENDPROC
 :
+REM Not transferred
 DEF PROCchange_window_background(RETURN w%,c%)
 !q%=w%
 SYS "Wimp_GetWindowInfo",,q%
@@ -122,17 +124,20 @@ SYS "Wimp_DeleteWindow",,q%
 IF (q%!32 AND (1<<16)) THEN : !q%=w% :SYS "Wimp_OpenWindow",,q%
 ENDPROC
 :
+REM Window: PROCwindow_force_redraw(window%)
 DEF PROCforce_window_redraw(!q%)
 SYS "Wimp_GetWindowState",,q%
 SYS "Wimp_ForceRedraw",!q%,q%!20,(q%!24)-(q%!16-q%!8),(q%!20)+(q%!12-q%!4),q%!24
 SYS "Wimp_ForceRedraw",-1,q%!4,q%!16,q%!12+40,q%!16+40
 ENDPROC
 :
+REM Not transferred
 DEF PROCforce_window_title_redraw(!q%)
 SYS "Wimp_GetWindowState",,q%
 SYS "Wimp_ForceRedraw",-1,q%!4,q%!16,q%!12+40,q%!16+40
 ENDPROC
 :
+REM Not transferred
 DEF PROCset_window_y_extent(!q%,y%,m%)
 IF y%<m% THEN y%=m%
 SYS "Wimp_GetWindowInfo",,(q% OR 1)
@@ -140,6 +145,7 @@ q%!48=q%!56-y%
 SYS "Wimp_SetExtent",!q%,q%+44
 ENDPROC
 :
+REM Not transferred
 DEF FNtitle_indirection(!a%) : SYS "Wimp_GetWindowInfo",,(a% OR 1) : =a%!76
 :
 REM Template Handling
