@@ -458,12 +458,14 @@ SYS "Wimp_ReportError",q%,%11,t$ TO ,c%
 :
 REM Territory Manager
 :
+REM Resources: FNresources_territory_name
 DEF FNterritory_name
 LOCAL t%
 SYS "Territory_Number" TO t%
 SYS "Territory_NumberToName",t%,q%,256
 =FNzero_string(q%)
 :
+REM Resources: FNresources_find_territory_folder(path$)
 DEF FNterritory_resources(p$)
 LOCAL f$,t%
 f$=p$+"."+FNterritory_name

@@ -21,37 +21,70 @@ REM OR CONDITIONS OF ANY KIND, either express or implied.
 REM
 REM See the Licence for the specific language governing
 REM permissions and limitations under the Licence.
+:
+REM Application and territory resource handling library.
 REM
-REM
-REM Universal resource handling library
-REM
-REM Version 0.01 - 15 March 1999
+REM The variable a% is reqired to point to 256 bytes of memory.
 
-DEF FNfind_latest_resources(dir$,prefix$,need%)
-:
-REM Version 0.01
+
+REM Return the name of the current terriory, as used in an application's
+REM resources.
 REM
-REM Returns the latest file possible for the given version number.  If prefix is set, only files
-REM staring with that text are checked.
+REM \return			The territory name.
 :
-LOCAL next%,version%,file_name$,version$
+DEF FNresources_territory_name
+LOCAL territory%, name$
+SYS "Territory_Number" TO t%
+SYS "Territory_NumberToName", territory%, a%, 256
+SYS "XOS_GenerateError",a% TO name$
+=name$
+
+
+REM Return the folder path for resources for the current territory, based on
+REM the supplied resources path.
+REM
+REM \param path$		The path to search on.
+REM \return			The territory path, with trailing . 
 :
+DEF FNresources_find_territory_folder(path$)
+LOCAL folder$, type%
+folder$ = path$ + "." + FNterritory_name
+SYS "XOS_File", 5, folder$ TO type%
+IF type% < 2 OR type% > 3 THEN folder$ = path$ + ".UK"
+=folder$ + "."
+
+
+REM Search a folder containing numeric filenames, and return the file with the
+REM greatest number that is less than or equal to a target value. Optionally,
+REM the files tested can all have a prefix on their name (which will be
+REM removed before testing).
+REM
+REM \param dir$			The directory to search in.
+REM \param prefix$		The optional filename prefix, or "".
+REM \param target%		The target version number.
+REM \return			The name of the file found, or "".
+:
+DEF FNresources_find_latest_object(dir$, prefix$, target%)
+LOCAL next%, version%, file_name$, version$
+
 next%=0
 version%=-1
-:
-REPEAT
- SYS "OS_GBPB",11,dir$,a%,1,next%,255,"*" TO ,,,read%,next%
- IF read%>0 THEN
-  file_name$=FNzero_string(a%+29)
-  IF prefix$<>"" OR LEFT$(file_name$,LEN(prefix$))=prefix$ THEN
-   IF prefix$<>"" THEN file_name$=MID$(file_name$,LEN(prefix$)+1)
 
-   IF VAL(file_name$)>version% AND VAL(file_name$)<=need% THEN
-    version%=VAL(file_name$)
-    version$=file_name$
-   ENDIF
-  ENDIF
- ENDIF
-UNTIL next%=-1
-:
+REPEAT
+	SYS "OS_GBPB", 11, dir$, a%, 1, next%, 255, "*" TO ,,,read%, next%
+	IF read% > 0 THEN
+		SYS "XOS_GenerateError",a% + 29 TO file_name$
+
+		IF prefix$ <> "" OR LEFT$(file_name$, LEN(prefix$)) = prefix$ THEN
+			IF prefix$ <> "" THEN file_name$ = MID$(file_name$, LEN(prefix$) + 1)
+
+			IF VAL(file_name$) > version% AND VAL(file_name$) <= target% THEN
+				version%=VAL(file_name$)
+				version$=file_name$
+			ENDIF
+		ENDIF
+	ENDIF
+UNTIL next% = -1
+
 =version$
+

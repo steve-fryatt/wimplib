@@ -21,8 +21,7 @@ REM OR CONDITIONS OF ANY KIND, either express or implied.
 REM
 REM See the Licence for the specific language governing
 REM permissions and limitations under the Licence.
-REM
-REM
+:
 REM Window handling library
 REM
 REM The variable a% is reqired to point to 256 bytes of memory.
@@ -158,7 +157,4 @@ SYS "Wimp_GetWindowState",,a%
 SYS "Wimp_ForceRedraw",!a%,a%!20,(a%!24)-(a%!16-a%!8),(a%!20)+(a%!12-a%!4),a%!24
 SYS "Wimp_ForceRedraw",-1,a%!4,a%!16,a%!12+40,a%!16+40
 ENDPROC
-
-
-
 
