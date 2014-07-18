@@ -57,16 +57,19 @@ DIM t% s% : !t%=s% : t%!8=16 : SYS "OS_SpriteOp",&10A,t%,f$
 :
 REM Window Handling
 :
+REM Window: PROCwindow_open(window%)
 DEF PROCopen_window(!q%)
 SYS "Wimp_GetWindowState",,q%
 q%!28=-1
 SYS "Wimp_OpenWindow",,q%
 ENDPROC
 :
+REM Window: PROCwindow_close(window%)
 DEF PROCclose_window(!q%)
 SYS "Wimp_CloseWindow",,q%
 ENDPROC
 :
+REM Window: PROCwindow_open_at(window%, x%, y%)
 DEF PROCopen_window_at(!q%,x%,y%)
 SYS "Wimp_GetWindowState",,q%
 q%!8=y%-(q%!16-q%!8)
@@ -76,15 +79,18 @@ q%!4=x%
 SYS "Wimp_OpenWindow",,q%
 ENDPROC
 :
+REM Window: PROCwindow_open_as_menu_at(window%, x%, y%)
 DEF PROCopen_window_as_menu_at(w%,x%,y%)
 SYS"Wimp_CreateMenu",,w%,x%,y%
 ENDPROC
 :
+REM Not transferred
 DEF PROCopen_window_centred_as_menu(!q%,x%,y%)
 SYS"Wimp_GetWindowState",,q%
 SYS"Wimp_CreateMenu",,w%,(x%-(q%!12-q%!4))/2,(y+(q%!16-q%!8))/2
 ENDPROC
 :
+REM Window: PROCwindow_open_centred_at(window%, x%, y%)
 DEF PROCopen_window_centred(!q%,x%,y%)
 LOCAL width%,height%
 SYS "Wimp_GetWindowState",,q%
