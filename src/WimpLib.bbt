@@ -49,6 +49,7 @@ WHILE INSTR(f$,".")
 ENDWHILE
 =LEFT$(p$)
 :
+REM Not transferred
 DEF FNload_sprites(f$)
 LOCAL s%,t%,f%
 f%=OPENIN(f$) : s%=EXT#f% : CLOSE#f% : s%+=4

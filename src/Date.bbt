@@ -21,44 +21,48 @@ REM OR CONDITIONS OF ANY KIND, either express or implied.
 REM
 REM See the Licence for the specific language governing
 REM permissions and limitations under the Licence.
-REM
-REM
+:
 REM Date handling library
-REM
-REM Version 0.01 - 28 February 2001
 
-DEF FNconvert_date_to_ordinals(date$,ptr%)
-:
-REM Converts a date in the format dd/mm/yy[.hh.mm] to ordinals
-:
-LOCAL num_table%,loop%,char%,level%
-:
-SYS "Territory_CharacterPropertyTable",-1,6 TO num_table%
-:
+
+REM Convert a textual date in the format dd/mm/yy[.hh.mm] into a set of
+REM ordinals, which are stored in the supplied block of memory.
+REM
+REM \param date$		The date string to parse.
+REM \param ptr%			Pointer to 28 bytes of memory to take ordinals.
+REM \return			0 if the date was dd/mm/yy; 1 if .hh.mm was
+REM				also present.
+
+DEF FNdate_convert_to_ordinals(date$, ptr%)
+LOCAL num_table%, loop%, char%, level%
+
+SYS "Territory_CharacterPropertyTable", -1, 6 TO num_table%
+
 FOR loop%=1 TO LEN(date$)
- char%=ASC(MID$(date$,loop%,1))
- IF (num_table%!(char% DIV 8) AND (1<<(char% MOD 8)))=0 THEN MID$(date$,loop%,1)=" "
+	char% = ASC(MID$(date$, loop%, 1))
+	IF (num_table%!(char% DIV 8) AND (1 << (char% MOD 8))) = 0 THEN MID$(date$, loop%, 1) = " "
 NEXT loop%
-:
-level%=0 : REM Returning only day
-:
-ptr%!0=0 : REM Centisecs
-ptr%!4=0 : REM Seconds
-ptr%!16=VAL(date$)
-date$=MID$(date$,INSTR(date$,STR$(ptr%!16))+LEN(STR$(ptr%!16)))
-ptr%!20=VAL(date$)
-date$=MID$(date$,INSTR(date$,STR$(ptr%!20))+LEN(STR$(ptr%!20)))
-ptr%!24=VAL(date$)
-date$=MID$(date$,INSTR(date$,STR$(ptr%!24))+LEN(STR$(ptr%!24)))
-IF date$<>"" THEN
- level%+=1
- ptr%!12=VAL(date$)
- date$=MID$(date$,INSTR(date$,STR$(ptr%!12))+LEN(STR$(ptr%!12)))
- ptr%!8=VAL(date$)
- date$=MID$(date$,INSTR(date$,STR$(ptr%!12))+LEN(STR$(ptr%!12)))
+
+level% = 0 : REM Returning only day until we know otherwise.
+
+ptr%!0 = 0 : REM Centisecs
+ptr%!4 = 0 : REM Seconds
+ptr%!16 = VAL(date$)
+date$ = MID$(date$, INSTR(date$, STR$(ptr%!16)) + LEN(STR$(ptr%!16)))
+ptr%!20 = VAL(date$)
+date$ = MID$(date$, INSTR(date$, STR$(ptr%!20)) + LEN(STR$(ptr%!20)))
+ptr%!24 = VAL(date$)
+date$ = MID$(date$, INSTR(date$, STR$(ptr%!24)) + LEN(STR$(ptr%!24)))
+IF date$ <> "" THEN
+	level% += 1
+	ptr%!12 = VAL(date$)
+	date$ = MID$(date$, INSTR(date$, STR$(ptr%!12)) + LEN(STR$(ptr%!12)))
+	ptr%!8 = VAL(date$)
+	date$ = MID$(date$, INSTR(date$, STR$(ptr%!12)) + LEN(STR$(ptr%!12)))
 ELSE
- ptr%!8=0
- ptr%!12=0
+	ptr%!8 = 0
+	ptr%!12 = 0
 ENDIF
+
 =level%
 

@@ -21,67 +21,63 @@ REM OR CONDITIONS OF ANY KIND, either express or implied.
 REM
 REM See the Licence for the specific language governing
 REM permissions and limitations under the Licence.
-REM
-REM
-REM Wimp Srpite handling library
-REM
-REM Version 0.01 - 28 February 1999
-
-
-
-
-DEF FNload_user_sprite_area(file_name$)
 :
-REM Version 0.01
+REM Wimp sprite and sprite area handling library
+
+
+REM Load a sprite file into a new block of memory, claimed via DIM. Use is made
+REM of the standard Wimp suffixes (22, 23, 24...) in an attempt to get the
+REM correct resoultion file.
 REM
-REM Loads a sprite file into a new area of memory.
-REM
-REM Use is made of the standard Wimp suffixes (22, 23, 24...) in an attempt to
-REM get the correct resoultion file.
+REM \param file_name$		The base filename of the file to load (no
+REM				suffix).
+REM \return			Pointer to new sprite area, or 0 on error.
 :
+DEF FNwimpsprite_load_user_sprites(file_name$)
 LOCAL area%, size%, type%
-:
-SYS "OS_File",17,file_name$+FNwimp_sprite_suffix TO type%,,,,size%
-:
-IF type%=1 THEN
- file_name$+=FNwimp_sprite_suffix
+
+SYS "OS_File", 17, file_name$ + FNwimpsprite_file_suffix TO type%,,,,size%
+
+IF type% = 1 THEN
+	file_name$ += FNwimpsprite_file_suffix
 ELSE
- SYS "OS_File",17,file_name$ TO type%,,,,size%
+	SYS "OS_File", 17, file_name$ TO type%,,,,size%
 ENDIF
-:
-IF type%=1 THEN
- size%+=4
- DIM area% size%
- !area%=size%
- area%!8=16
- SYS "OS_SpriteOp",&10A,area%,file_name$
+
+IF type% = 1 THEN
+	size% += 4
+	DIM area% size%
+	!area% = size%
+	area%!8 = 16
+	SYS "OS_SpriteOp", &10A, area%, file_name$
 ELSE
- area%=0
+	area% = 0
 ENDIF
-:
+
 =area%
 
 
-
-
-DEF FNwimp_sprite_suffix
-:
-REM Version 0.01
+REM Return the correct suffix for sprite files in the current mode. This does
+REM the job of Wimp_ReadSysInfo 2, but gets it correct.
 REM
-REM Returns the correct suffix for sprite files in the current mode.
+REM \TODO -- This should probably now use Wimp_Extend 13 and Wimp_ReadSystInfo 2
+REM          first to cover new systems?
 REM
-REM This does the job of Wimp_ReadSysInfo 2 but gets it correct.
+REM \return			The sprite file suffix for the current mode.
 :
+DEF FNwimpsprite_file_suffix
 LOCAL suffix$, mode_flags%, y_eig%
-:
-suffix$=""
-:
-SYS "OS_ReadModeVariable",-1,0 TO ,,mode_flags%
+
+suffix$ = ""
+
+SYS "OS_ReadModeVariable", -1, 0 TO ,,mode_flags%
+
 IF mode_flags% AND &10 THEN
- suffix$="23"
+	suffix$ = "23"
 ELSE
- SYS "OS_ReadModeVariable",-1,5 TO ,,y_eig%
- IF y_eig%<2 THEN suffix$="22"
+	SYS "OS_ReadModeVariable", -1, 5 TO ,,y_eig%
+	IF y_eig% < 2 THEN suffix$ = "22"
 ENDIF
-:
+
 =suffix$
+
