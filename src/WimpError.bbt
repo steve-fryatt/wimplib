@@ -21,63 +21,83 @@ REM OR CONDITIONS OF ANY KIND, either express or implied.
 REM
 REM See the Licence for the specific language governing
 REM permissions and limitations under the Licence.
-REM
-REM
+:
 REM Wimp error handling library
 REM
-REM Version 0.02 - 22 November 2002
+REM The variable a% is reqired to point to 256 bytes of memory.
+
+
+REM Initialise the error handler, saving the name of the client task and the
+REM sprite that it uses.
+REM
+REM \param taskname$		The name of the client task.
+REM \param sprite$		The name of the sprite used by the task.
 :
-DEF PROCwimp_error_initialise(task_name$,task_sprite$)
-:
-REM Initialise some global variables.
-:
-wimp_error_task_name$=task_name$
-wimp_error_task_sprite$=task_sprite$
+DEF PROCwimperror_initialise(taskname$, sprite$)
+WimpErrorTaskName$=taskname$
+WimpErrorTaskSprite$=sprite$
 ENDPROC
 
 
-
-DEF PROCwimp_report(message$,type%,buttons%,buttons$)
+REM Report a message in an Wimp error box, with no feedback from the user. Either
+REM the default OK and/or Cancel can be used, or a custom string of buttons --
+REM in the latter case, the default buttons are disabled.
+REM
+REM \param message$		The text of the message to be displayed.
+REM \param type%		The type of message box (0 - 4).
+REM \param buttons%		Flags for OK and Cancel buttons.
+REM \param buttons$		Comma-separated list of custom buttons, or "".
 :
+DEF PROCwimperror_report(message$, type%, buttons%, buttons$)
 LOCAL dummy%
-:
-dummy%=FNwimp_report(message$,type%,buttons%,buttons$)
-:
+
+dummy%=FNwimperror_report(message$,type%,buttons%,buttons$)
 ENDPROC
 
 
+REM Report a message in an Wimp error box, returning the selection made by the
+REM user from the error box. Either the default OK and/or Cancel can be used,
+REM or a custom string of buttons -- in the latter case, the default buttons
+REM are disabled.
+REM
+REM \param message$		The text of the message to be displayed.
+REM \param type%		The type of message box (0 - 4).
+REM \param buttons%		Flags for OK and Cancel buttons.
+REM \param buttons$		Comma-separated list of custom buttons, or "".
+REM \return			The user's selection, rebased to zero if custom
+REM				buttons are used.
+:
+DEF FNwimperror_report(message$, type%, buttons%, buttons$)
+LOCAL result%, flags%
 
-DEF FNwimp_report(message$,type%,buttons%,buttons$)
-:
-LOCAL result%,flags%
-:
-flags%=&0100+((type% AND %111)<<9)+(buttons% AND %11)
-:
-!q%=255
-$(q%+4)=message$+CHR$(0)
-IF buttons$="" THEN
- SYS "Wimp_ReportError",q%,flags%,wimp_error_task_name$,wimp_error_task_sprite$,1,0 TO ,result%
+flags% = &0100 + ((type% AND %111) << 9) + (buttons% AND %11)
+
+!a% = 255
+$(a% + 4) = message$ + CHR$(0)
+IF buttons$ = "" THEN
+	SYS "Wimp_ReportError", a%, flags%, WimpErrorTaskName$, WimpErrorTaskSprite$, 1, 0 TO ,result%
 ELSE
- flags%=flags% AND (NOT %11)
- SYS "Wimp_ReportError",q%,flags%,wimp_error_task_name$,wimp_error_task_sprite$,1,buttons$ TO ,result%
- result%-=2
+	flags% = flags% AND (NOT %11)
+	SYS "Wimp_ReportError", a%, flags%, WimpErrorTaskName$, WimpErrorTaskSprite$, 1, buttons$ TO ,result%
+	result% -= 2
 ENDIF
+
 =result%
 
 
+REM Report the last error using a Wimp error box; if RISC OS 3.5+ is used, the
+REM message will be classified as a "Program Report".
+REM
+REM \return			TRUE if the caller should exit; else FALSE.
 
-
-DEF FNwimp_error
-:
-REM Report the last error using the standatr BASIC Wimp method.  If RISC OS 3.5+ is used, it is classified
-REM as a 'Program report'.
-:
+DEF FNwimperror_program
 LOCAL result%
-:
+
 SYS "Hourglass_Smash"
-:
-!q%=ERR
-$(q%+4)=task_name$+" has suffered an internal error ("+REPORT$+"; error code "+STR$(ERL)+")"+CHR$(0)
-SYS "Wimp_ReportError",q%,&0703,wimp_error_task_name$,wimp_error_task_sprite$,1,0 TO ,result%
-:
-=result%
+
+!a% = ERR
+$(a% + 4) = task_name$ + " has suffered an internal error (" + REPORT$ + "; error code " + STR$(ERL) + ")" + CHR$(0)
+SYS "Wimp_ReportError", a%, &0703, WimpErrorTaskName$, WimpErrorTaskSprite$, 1, 0 TO ,result%
+
+=(result% = 2)
+

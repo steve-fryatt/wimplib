@@ -39,7 +39,7 @@ DEF PROClaunch_url(url$)
 :
 REM Launch an URL.
 :
-IF FNant_broadcast(url$) THEN PROCwimp_report(FNmessage_trans("URLFailed"),1,%01,"")
+IF FNant_broadcast(url$) THEN PROCwimperror_report(FNmessage_trans("URLFailed"),1,%01,"")
 ENDPROC
 :
 :
@@ -62,11 +62,11 @@ CASE message%!16 OF
    SYS "URI_RequestURI",0,q%,255,message%!24 TO ,,len%
    q%?len%=13
    :
-   IF FNant_load($q%) THEN PROCwimp_report(FNmessage_trans("URLFailed"),1,%01,"")
+   IF FNant_load($q%) THEN PROCwimperror_report(FNmessage_trans("URLFailed"),1,%01,"")
   ENDIF
  WHEN &4AF80 : REM Message_ANTOpenURL
   IF FNuri_dispatch(message%+20) THEN
-   IF FNant_load(FNctrl_string(message%+20)) THEN PROCwimp_report(FNmessage_trans("URLFailed"),1,%01,"")
+   IF FNant_load(FNctrl_string(message%+20)) THEN PROCwimperror_report(FNmessage_trans("URLFailed"),1,%01,"")
   ENDIF
 ENDCASE
 ENDPROC
