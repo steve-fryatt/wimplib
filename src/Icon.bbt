@@ -25,74 +25,121 @@ REM
 REM
 REM Icon handling library
 REM
-REM Version 0.10 - 21 September 2002
+REM The variable a% is reqired to point to 256 bytes of memory.
+
+REM Get the address of an icon's indirected text buffer.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon of interest.
+REM \return			Pointer to the buffer, or 0 if not indirected.
+:
+DEF FNicon_indirection(!a%, a%!4)
+SYS "Wimp_GetIconState",,a%
+IF (a%!24 AND &100) = 0 THEN =0
+=a%!28
 
 
-DEF PROCset_icon_selected(!q%,q%!4,selected%)
-LOCAL eor%,clear%
-IF selected% THEN clear%+=(1<<21) : eor%+=(1<<21) ELSE clear%+=(1<<21) : eor%+=(0<<21)
-q%!8=eor%
-q%!12=clear%
-SYS "Wimp_SetIconState",,q%
+REM Get the address of an icon's validation string.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon of interest.
+REM \return			Pointer to the string, or 0 if not indirected.
+:
+DEF FNicon_indirection(!a%, a%!4)
+SYS "Wimp_GetIconState",,a%
+IF (a%!24 AND &100) = 0 THEN =0
+=a%!32
+
+
+REM Set the selected state of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be updated.
+REM \selected%			TRUE to select the icon; FALSE to deselect it.
+:
+DEF PROCicon_set_selected(!a%, a%!4, selected%)
+LOCAL eor%, clear%
+
+IF selected% THEN clear% += (1<<21) : eor% += (1<<21) ELSE clear% += (1<<21) : eor% += (0<<21)
+a%!8 = eor%
+a%!12 = clear%
+SYS "Wimp_SetIconState",,a%
 ENDPROC
+
+
+REM Set the shaded state of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be updated.
+REM \shaded%			TRUE to shade the icon; FALSE to unshade it.
 :
-:
-:
-:
-REM --------------------------------------------------------------------------------------------------------------------
-:
-:
-:
-:
-DEF PROCset_icon_shaded(!q%,q%!4,shaded%)
-LOCAL eor%,clear%
-IF shaded% THEN clear%+=(1<<22) : eor%+=(1<<22) ELSE clear%+=(1<<22) : eor%+=(0<<22)
-q%!8=eor%
-q%!12=clear%
-SYS "Wimp_SetIconState",,q%
+DEF PROCicon_set_shaded(!a%, a%!4, shaded%)
+LOCAL eor%, clear%
+
+IF shaded% THEN clear% += (1<<22) : eor% += (1<<22) ELSE clear% += (1<<22) : eor% += (0<<22)
+a%!8 = eor%
+a%!12 = clear%
+SYS "Wimp_SetIconState",,a%
 ENDPROC
+
+
+REM Set the deleted state of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be updated.
+REM \deleted%			TRUE to delete the icon; FALSE to undelete it.
 :
-:
-:
-:
-REM --------------------------------------------------------------------------------------------------------------------
-:
-:
-:
-:
-DEF PROCset_icon_deleted(!q%,q%!4,deleted%)
-LOCAL eor%,clear%
-IF deleted% THEN clear%+=(1<<23) : eor%+=(1<<23) ELSE clear%+=(1<<23) : eor%+=(0<<23)
-q%!8=eor%
-q%!12=clear%
-SYS "Wimp_SetIconState",,q%
+DEF PROCicon_set_deleted(!a%, a%!4, deleted%)
+LOCAL eor%, clear%
+
+IF deleted% THEN clear% += (1<<23) : eor% += (1<<23) ELSE clear% += (1<<23) : eor% += (0<<23)
+a%!8 = eor%
+a%!12 = clear%
+SYS "Wimp_SetIconState",,a%
 ENDPROC
+
+
+REM Bump a numeric value in an icon by one in a given direction, between limits.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be updated.
+REM \direction%			TRUE to increase the value; FALSE to decrease.
+REM \param min%			The minimum range for the icon, inclusive.
+REM \param max%			The maximum range for the icon, inclusive.
+REM \param pad%			The length to which to pad the number with
+REM				leading zeros, or 0 for none.
 :
-:
-:
-:
-REM --------------------------------------------------------------------------------------------------------------------
-:
-:
-:
-:
-DEF PROCbump_icon(window%,icon%,direction%,min%,max%,pad%)
-:
-LOCAL val%,val$
-:
-val$=$FNicon_indirection(window%,icon%)
-val%=VAL(val$)
+DEF PROCicon_bump_value(window%, icon%, direction%, min%, max%, pad%)
+LOCAL val%, val$
+
+val$ = $FNicon_indirection(window%, icon%)
+val% = VAL(val$)
+
 IF direction% THEN
- val%+=1
- IF val%<=max% THEN val$=STR$(val%)
+	val% += 1
+	IF val% <= max% THEN val$ = STR$(val%)
 ELSE
- val%-=1
- IF val%>=min% THEN val$=STR$(val%)
+	val% -= 1
+	IF val% >= min% THEN val$ = STR$(val%)
 ENDIF
-IF pad%>0 THEN val$=RIGHT$(STRING$(pad%,"0")+val$,pad%)
-$FNicon_indirection(window%,icon%)=val$
-:
-SYS "Wimp_GetCaretPosition",,q%
-IF !q%=window% AND q%!4=icon% THEN SYS "Wimp_SetCaretPosition",window%,icon%,,,-1,LEN(val$)
-PROCforce_icon_redraw(window%,icon%)
+
+IF pad% > 0 THEN val$ = RIGHT$(STRING$(pad%, "0") + val$, pad%)
+
+$FNicon_indirection(window%, icon%) = val$
+
+SYS "Wimp_GetCaretPosition",,a%
+IF !a% = window% AND a%!4 = icon% THEN SYS "Wimp_SetCaretPosition", window%, icon%,,, -1, LEN(val$)
+PROCicon_redraw(window%, icon%)
 ENDPROC
+
+
+REM Force an icon to be redrawn.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be redrawn.
+:
+DEF PROCicon_redraw(!a%, a%!4)
+SYS "Wimp_GetIconState",,a%
+SYS "Wimp_ForceRedraw", !a%, a%!8, a%!12, a%!16, a%!20
+ENDPROC
+

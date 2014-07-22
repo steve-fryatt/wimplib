@@ -210,8 +210,10 @@ DEF FNicon_shaded(!q%,q%!4) : SYS "Wimp_GetIconState",,q% : =((q%!24 AND (1<<22)
 :
 DEF FNicon_deleted(!q%,q%!4) : SYS "Wimp_GetIconState",,q% : =((q%!24 AND (1<<23))<>0)
 :
+REM Icon: FNicon_indirection(window%, icon%)
 DEF FNicon_indirection(!a%,a%!4) : SYS "Wimp_GetIconState",,a% : =a%!28
 :
+REM Icon: FNicon_validation(window%, icon%)
 DEF FNicon_validation(!a%,a%!4) : SYS "Wimp_GetIconState",,a% : =a%!32
 :
 DEF PROCset_icon_colours(!q%,q%!4,f%,b%)
@@ -258,6 +260,7 @@ IF v%>=l% THEN $FNicon_indirection(w%,i%)=STR$(v%)
 PROCforce_icon_redraw(w%,i%)
 ENDPROC
 :
+REM Icon: FNicon_force_redraw(window%, icon%)
 DEF PROCforce_icon_redraw(!q%,q%!4)
 SYS "Wimp_GetIconState",,q%
 SYS "Wimp_ForceRedraw",!q%,q%!8,q%!12,q%!16,q%!20
