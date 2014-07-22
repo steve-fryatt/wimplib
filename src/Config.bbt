@@ -21,199 +21,257 @@ REM OR CONDITIONS OF ANY KIND, either express or implied.
 REM
 REM See the Licence for the specific language governing
 REM permissions and limitations under the Licence.
-REM
-REM
+:
 REM Configuration handling library
 REM
-REM Version 0.01 - 28 January 1999
-REM         0.02 - 16 June    2001
+REM The variable a% is reqired to point to 256 bytes of memory.
 
 
-DEF PROCinitialise_config(options%,app_name$)
+REM Initialsse the config module.
+REM
+REM \param options%		The number of options to allocate space for.
+REM \param app_name$		The name of the client application.
 :
-DIM configuration_data$(options%-1,2)
-configuration_data$()=""
-configuration_options%=0
-max_configuration_options%=options%
-configuration_app_name$=app_name$
+DEF PROCconfig_initialise(options%, app_name$)
+DIM ConfigData$(options% - 1, 2)
+ConfigData$() = ""
+ConfigOptionCount% = 0
+ConfigMaxOptions% = options%
+ConfigAppName$ = app_name$
 ENDPROC
+
+
+REM Initialise a real configuration option.
+REM
+REM \param item$		The name of the option to initialise.
+REM \param value		The initial value to assign to the option.
 :
-:
-DEF PROCinit_num_config(item$,value)
-PROCinit_str_config(item$,STR$(value))
+DEF PROCconfig_init_real(item$, value)
+PROCconfig_init_string(item$, STR$(value))
 ENDPROC
+
+
+REM Initialise an integer configuration option.
+REM
+REM \param item$		The name of the option to initialise.
+REM \param value%		The initial value to assign to the option.
 :
-:
-DEF PROCinit_int_config(item$,value%)
-PROCinit_str_config(item$,STR$(value%))
+DEF PROCconfig_init_integer(item$, value%)
+PROCconfig_init_string(item$, STR$(value%))
 ENDPROC
+
+
+REM Initialise a boolean configuration option.
+REM
+REM \param item$		The name of the option to initialise.
+REM \param value%		The initial value to assign to the option.
 :
-:
-DEF PROCinit_opt_config(item$,state%)
-:
+DEF PROCconfig_init_boolean(item$, state%)
 LOCAL value$
-:
-IF state% THEN value$="On" ELSE value$="Off"
-PROCinit_str_config(item$,value$)
+
+IF state% THEN value$ = "On" ELSE value$ = "Off"
+PROCconfig_init_string(item$, value$)
 ENDPROC
+
+
+REM Initialise a string configuration.
+REM
+REM \param item$		The name of the option option to initialise.
+REM \param value$		The initial value to assign to the option.
 :
-:
-DEF PROCinit_str_config(item$,value$)
-IF configuration_options%<max_configuration_options% THEN
- configuration_data$(configuration_options%,0)=item$
- configuration_data$(configuration_options%,1)=value$
- configuration_data$(configuration_options%,2)=value$
- configuration_options%+=1
-ELSE
- ERROR 255,"Too many configuration options"
-ENDIF
+DEF PROCconfig_init_string(item$, value$)
+IF ConfigOptionCount% >= ConfigMaxOptions% THEN ERROR 255, "Too many configuration options"
+
+ConfigData$(ConfigOptionCount%, 0) = item$
+ConfigData$(ConfigOptionCount%, 1) = value$
+ConfigData$(ConfigOptionCount%, 2) = value$
+ConfigOptionCount%+=1
 ENDPROC
+
+
+REM Set the value of a real configuration option.
+REM
+REM \param item$		The name of the option to set.
+REM \param value		The new value to assign to the option.
 :
-:
-REM ================================================================================================
-:
-:
-DEF PROCset_num_config(item$,value)
-PROCset_str_config(item$,STR$(value))
+DEF PROCconfig_set_real(item$, value)
+PROCconfig_set_string(item$, STR$(value))
 ENDPROC
+
+
+REM Set the value of an integer configuration option.
+REM
+REM \param item$		The name of the option to set.
+REM \param value%		The new value to assign to the option.
 :
-:
-DEF PROCset_int_config(item$,value%)
-PROCset_str_config(item$,STR$(value%))
+DEF PROCconfig_set_integer(item$, value%)
+PROCconfig_set_string(item$, STR$(value%))
 ENDPROC
+
+
+REM Set the value of a boolean configuration option.
+REM
+REM \param item$		The name of the option to set.
+REM \param value%		The new value to assign to the option.
 :
-:
-DEF PROCset_opt_config(item$,value%)
-:
+DEF PROCconfig_set_boolean(item$, value%)
 LOCAL value$
-:
-IF value% THEN value$="On" ELSE value$="Off"
-PROCset_str_config(item$,value$)
+
+IF value% THEN value$ = "On" ELSE value$ = "Off"
+PROCconfig_set_string(item$, value$)
 ENDPROC
+
+
+REM Set the value of a string configuration option.
+REM
+REM \param item$		The name of the option to set.
+REM \param value%		The new value to assign to the option.
 :
-:
-DEF PROCset_str_config(item$,value$)
-:
+DEF PROCconfig_set_string(item$, value$)
 LOCAL loop%
-:
-FOR loop%=0 TO configuration_options%-1
- IF configuration_data$(loop%,0)=item$ THEN configuration_data$(loop%,2)=value$
+
+FOR loop% = 0 TO ConfigOptionCount% - 1
+	IF ConfigData$(loop%, 0) = item$ THEN ConfigData$(loop%, 2) = value$
 NEXT loop%
 ENDPROC
-:
-:
-REM ================================================================================================
-:
-:
-DEF PROCreset_default_config
 
 
-ENDPROC
+REM Read the value of a real configuration option.
+REM
+REM \param item$		The name of the option to read.
+REM \return			The current value assigned to the option.
 :
+DEF PROCconfig_read_real(item$)
+=VAL(PROCconfig_read_string(item$))
+
+
+REM Read the value of an integer configuration option.
+REM
+REM \param item$		The name of the option to read.
+REM \return			The current value assigned to the option.
 :
-REM ================================================================================================
+DEF PROCconfig_read_integer(item$)
+=INT(VAL(PROCconfig_read_string(item$)))
+
+
+REM Read the value of a boolean configuration option.
+REM
+REM \param item$		The name of the option to read.
+REM \return			The current value assigned to the option.
 :
-:
-DEF FNread_num_config(item$)
-=VAL(FNread_str_config(item$))
-:
-:
-DEF FNread_int_config(item$)
-=INT(VAL(FNread_str_config(item$)))
-:
-:
-DEF FNread_opt_config(item$)
-:
+DEF PROCconfig_read_boolean(item$)
 LOCAL result%
-:
-CASE FNread_str_config(item$) OF
- WHEN "Off" : result%=FALSE
- WHEN "On"  : result%=TRUE
- OTHERWISE  : ERROR 255,"Unrecognised option type"
+
+CASE PROCconfig_read_string(item$) OF
+WHEN "Off"	: result% = FALSE
+WHEN "On"	: result% = TRUE
+OTHERWISE	: ERROR 255, "Unrecognised option type"
 ENDCASE
 =result%
+
+
+REM Read the value of a string configuration option.
+REM
+REM \param item$		The name of the option to read.
+REM \return			The current value assigned to the option.
 :
-:
-DEF FNread_str_config(item$)
-:
-LOCAL loop%,result$
-:
-FOR loop%=0 TO configuration_options%-1
- IF configuration_data$(loop%,0)=item$ THEN result$=configuration_data$(loop%,2)
+DEF PROCconfig_read_string(item$)
+LOCAL loop%, result$
+
+FOR loop% = 0  TO ConfigOptionCount% - 1
+	IF ConfigData$(loop%, 0) = item$ THEN result$ = ConfigData$(loop%, 2)
 NEXT loop%
 =result$
+
+
+REM Reset the configuration values back to their defualts.
 :
-:
-REM ================================================================================================
-:
-:
-DEF PROCsave_config_file(file$)
-:
-LOCAL file%,loop%,value$
-:
-file%=OPENOUT(file$)
-:
-BPUT#file%,"# >"+file$
-BPUT#file%,"#"
-BPUT#file%,"# Config file for "+configuration_app_name$
-BPUT#file%,"# Last automatically generated on "+TIME$
-BPUT#file%,""
-:
-FOR loop%=0 TO configuration_options%-1
- IF configuration_data$(loop%,1)<>configuration_data$(loop%,2) THEN
-  value$=configuration_data$(loop%,2)
-  IF ASC(LEFT$(value$,1))<=32 OR ASC(RIGHT$(value$))<=32 THEN value$=""""+value$+""""
-  BPUT#file%,configuration_data$(loop%,0)+": "+value$
- ENDIF
+DEF PROCconfig_restore_defaults
+ENDPROC
+
+
+REM Save the current configuration option settings to disc.
+REM
+REM \param file$		The file to save the settings to.
+
+DEF PROCconfig_save_file(file$)
+LOCAL file%, loop%, value$
+
+file% = OPENOUT(file$)
+IF file% = 0 THEN ENDPROC
+
+BPUT#file%, "# >" + file$
+BPUT#file%, "#"
+BPUT#file%, "# Config file for " + ConfigAppName$
+BPUT#file%, "# Last automatically generated on " + TIME$
+BPUT#file%, ""
+
+FOR loop% = 0 TO ConfigOptionCount% - 1
+	IF ConfigData$(loop%, 1) <> ConfigData$(loop%, 2) THEN
+		value$ = ConfigData$(loop%, 2)
+		IF ASC(LEFT$(value$, 1)) <= 32 OR ASC(RIGHT$(value$)) <= 32 THEN value$ = """" + value$ + """"
+		BPUT#file%, ConfigData$(loop%, 0) + ": " + value$
+	ENDIF
 NEXT loop%
-:
+
 CLOSE#file%
-SYS "OS_File",18,file$,&FFF
+SYS "OS_File", 18, file$, &FFF
 ENDPROC
+
+
+REM Load saved configuration options from disc, updating the values in memory
+REM accordingly.
+REM
+REM \param file$		The file to load the settings from.
 :
-:
-DEF FNload_config_file(file$)
-:
-LOCAL file%,loop%,line$,option$,value$,bytes%
-:
-file%=OPENIN(file$)
-$a%=""
-:
-IF file%<>0 THEN
- WHILE NOT EOF#file%
-  line$=GET$#file%
-  WHILE LEFT$(line$,1)=" "
-   line$=MID$(line$,2)
-  ENDWHILE
-  IF LEFT$(line$,1)<>"#" AND LEN(line$)>0 AND INSTR(line$,":")>0 THEN
-   option$=LEFT$(line$,INSTR(line$,":")-1)
-   FOR loop%=0 TO configuration_options%-1
-    IF configuration_data$(loop%,0)=option$ THEN
-     value$=MID$(line$,INSTR(line$,":")+1)
-     WHILE ASC(LEFT$(value$,1))<=32
-      value$=MID$(value$,2)
-     ENDWHILE
-     WHILE ASC(RIGHT$(value$))<=32
-      value$=LEFT$(value$)
-     ENDWHILE
-     IF LEFT$(value$,1)="""" AND RIGHT$(value$)="""" THEN value$=MID$(value$,2,LEN(value$)-2)
-     configuration_data$(loop%,2)=value$
-    ENDIF
-   NEXT loop%
-  ENDIF
- ENDWHILE
- :
- SYS "OS_Args",7,file%,a%,,,256 TO ,,,,,bytes%
- IF bytes%>=1 THEN a%?(256-bytes%)=13 ELSE $a%=""
- :
- CLOSE#file%
-ENDIF
-=$a%
-:
-:
-DEF PROCload_config_file(file$)
-:
+DEF PROCconfig_load_file(file$)
 LOCAL dummy$
-:
-dummy$=FNload_config_file(file$)
+
+dummy$=FNconfig_load_file(file$)
 ENDPROC
+
+
+REM Load saved configuration options from disc, updating the values in memory
+REM accordingly and returning the full name of the file used.
+REM
+REM \param file$		The file to load the settings from.
+REM \return			The full name of the file that was loaded.
+:
+DEF FNconfig_load_file(file$)
+LOCAL file%, loop%, line$, option$, value$, bytes%
+
+file% = OPENIN(file$)
+IF file% = 0 THEN =""
+
+$a%=""
+
+WHILE NOT EOF#file%
+	line$ = GET$#file%
+	WHILE LEFT$(line$, 1) = " "
+		line$ = MID$(line$, 2)
+	ENDWHILE
+
+	IF LEFT$(line$, 1) <> "#" AND LEN(line$) > 0 AND INSTR(line$, ":") > 0 THEN
+		option$ = LEFT$(line$, INSTR(line$, ":") - 1)
+		FOR loop% = 0 TO ConfigOptionCount% - 1
+			IF ConfigData$(loop%, 0) = option$ THEN
+				value$ = MID$(line$, INSTR(line$, ":") + 1)
+				WHILE ASC(LEFT$(value$, 1)) <= 32
+					value$ = MID$(value$, 2)
+				ENDWHILE
+				WHILE ASC(RIGHT$(value$)) <= 32
+					value$ = LEFT$(value$)
+				ENDWHILE
+				IF LEFT$(value$, 1) = """" AND RIGHT$(value$) = """" THEN value$ = MID$(value$, 2, LEN(value$) - 2)
+				ConfigData$(loop%, 2) = value$
+			ENDIF
+		NEXT loop%
+	ENDIF
+ENDWHILE
+
+SYS "OS_Args", 7, file%, a%,,,256 TO ,,,,,bytes%
+IF bytes% >= 1 THEN a%?(256 - bytes%) = 13 ELSE $a% = ""
+
+CLOSE#file%
+=$a%
+
