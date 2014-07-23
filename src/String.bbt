@@ -21,129 +21,84 @@ REM OR CONDITIONS OF ANY KIND, either express or implied.
 REM
 REM See the Licence for the specific language governing
 REM permissions and limitations under the Licence.
-REM
-REM
+:
 REM String handling library
+
+
+REM Return as a BASIC string a string from memory terminated by
+REM ASCII 0, 10 or 13.
 REM
-REM Version 0.02 - 8 February 2001
+REM \param string%		Pointer to the string in memory.
+REM \return			The string extracted from memory.
+:
+DEF FNstring_read((string%)
+LOCAL string$
+SYS "XOS_GenerateError", string% TO string$
+=string$
 
 
-DEF FNzero_string(string%)
+REM Return as a BASIC string a control character terminated string from the
+REM supplied pointer. Update the pointer to point to the next piece of data.
+REM
+REM \param string%		Pointer to the string to extract; updated on
+REM				return to point to terminating byte.
+REM \return			The string extracted from the pointer.
 :
-REM Return as a BASIC string a null terminated string.
-:
+DEF FNstring_extract_ctrl(RETURN string%)
 LOCAL string$
-:
-WHILE ?string%<>0
- string$+=CHR$(?string%)
- string%+=1
+
+WHILE ?string% >= 32
+	string$ += CHR$(?string%)
+	string% += 1
 ENDWHILE
 =string$
-:
-:
-:
-:
-REM --------------------------------------------------------------------------------------------------------------------
-:
-:
-:
-:
-DEF FNctrl_string(string%)
-:
-REM Return as a BASIC string a control character terminated string.
-:
-LOCAL string$
-:
-WHILE ?string%>=32
- string$+=CHR$(?string%)
- string%+=1
+
+
+REM Remove all leading and trailing whitespace from a sreing.
+REM
+REM \param			The string to be trimmed.
+REM \return			The string without any surrounding whitespace.
+
+DEF FNstring_trim(string$)
+WHILE ASC(LEFT$(string$,1)) <= 32 AND LEN(string$) > 0
+	string$ = MID$(string$, 2)
+ENDWHILE
+WHILE ASC(RIGHT$(string$)) <= 32 AND LEN(string$) > 0
+	string$ = LEFT$(string$)
 ENDWHILE
 =string$
+
+
+REM Convert a string into upper case.
+REM
+REM \param string$		The string to be converted.
+REM \return			The string converted into upper case.
 :
-:
-:
-:
-REM --------------------------------------------------------------------------------------------------------------------
-:
-:
-:
-:
-DEF FNextract_ctrl_string(RETURN string%)
-:
-REM Return as a BASIC string a control character terminated string.  Update string% to point to the next piece of data.
-:
-LOCAL string$
-:
-WHILE ?string%>=32
- string$+=CHR$(?string%)
- string%+=1
-ENDWHILE
-=string$
-:
-:
-:
-:
-REM --------------------------------------------------------------------------------------------------------------------
-:
-:
-:
-:
-DEF FNstrip_surrounding_whitespace(s$)
-:
-REM Remove any whitespace around the string
-:
-WHILE ASC(LEFT$(s$,1))<=32 AND LEN(s$)>0
- s$=MID$(s$,2)
-ENDWHILE
-WHILE ASC(RIGHT$(s$))<=32 AND LEN(s$)>0
- s$=LEFT$(s$)
-ENDWHILE
-:
-=s$
-:
-:
-:
-:
-REM --------------------------------------------------------------------------------------------------------------------
-:
-:
-:
-:
-DEF FNto_upper(string$)
-:
-REM Force a string to upper case.
-:
-LOCAL loop%,char%,table%
-:
-SYS "Territory_UpperCaseTable",-1 TO table%
-:
-FOR loop%=1 TO LEN(string$)
- char%=ASC(MID$(string$,loop%,1))
- MID$(string$,loop%,1)=CHR$(table%?char%)
+DEF FNstring_to_upper(string$)
+LOCAL loop%, char%, table%
+
+SYS "Territory_UpperCaseTable", -1 TO table%
+
+FOR loop% = 1 TO LEN(string$)
+	char% = ASC(MID$(string$, loop%, 1))
+	MID$(string$, loop%, 1) = CHR$(table%?char%)
 NEXT loop%
-:
 =string$
+
+
+REM Convert a string into lower case.
+REM
+REM \param string$		The string to be converted.
+REM \return			The string converted into lower case.
 :
-:
-:
-:
-REM --------------------------------------------------------------------------------------------------------------------
-:
-:
-:
-:
-DEF FNto_lower(string$)
-:
-REM Force a string to lower case.
-:
-LOCAL loop%,char%,table%
-:
-SYS "Territory_LowerCaseTable",-1 TO table%
-:
-FOR loop%=1 TO LEN(string$)
- char%=ASC(MID$(string$,loop%,1))
- MID$(string$,loop%,1)=CHR$(table%?char%)
+DEF FNstring_to_lower(string$)
+LOCAL loop%, char%, table%
+
+SYS "Territory_LowerCaseTable", -1 TO table%
+
+FOR loop% = 1 TO LEN(string$)
+	char% = ASC(MID$(string$, loop%, 1))
+	MID$(string$, loop%, 1) = CHR$(table%?char%)
 NEXT loop%
-:
 =string$
 

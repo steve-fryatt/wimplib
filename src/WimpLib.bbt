@@ -27,6 +27,7 @@ REM Library of Wimp Routines for Window, Icon, and Menu Handling
 :
 REM File Handling
 :
+REM String: FNstring_read(string%)
 DEF FNzero_string(p%)
 LOCAL a$
 WHILE ?p%<>0
