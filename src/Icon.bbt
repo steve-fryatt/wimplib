@@ -26,6 +26,7 @@ REM Icon handling library
 REM
 REM The variable a% is reqired to point to 256 bytes of memory.
 
+
 REM Get the address of an icon's indirected text buffer.
 REM
 REM \param window%		The handle of the window containing the icon.
@@ -44,10 +45,74 @@ REM \param window%		The handle of the window containing the icon.
 REM \param icon%		The number of the icon of interest.
 REM \return			Pointer to the string, or 0 if not indirected.
 :
-DEF FNicon_indirection(!a%, a%!4)
+DEF FNicon_validation(!a%, a%!4)
 SYS "Wimp_GetIconState",,a%
 IF (a%!24 AND &100) = 0 THEN =0
 =a%!32
+
+
+REM Get the selected state of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon of interest.
+REM \return			TRUE if the icon is selected; FALSE if not.
+:
+DEF FNicon_selected(!a%, a%!4)
+SYS "Wimp_GetIconState",,a%
+=((a%!24 AND &200000) <> 0)
+
+
+REM Get the shaded state of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon of interest.
+REM \return			TRUE if the icon is shaded; FALSE if not.
+:
+DEF FNicon_shaded(!a%, a%!4)
+SYS "Wimp_GetIconState",,a%
+=((a%!24 AND &400000) <> 0)
+
+
+REM Get the background Wimp colour of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon of interest.
+REM \return			The Wimp colour of the icon's background
+:
+DEF FNicon_background_colour(!a%, a%!4)
+SYS "Wimp_GetIconState",,a%
+=((a%!24 AND &F0000000) >>> 28)
+
+
+REM Get the foreground Wimp colour of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon of interest.
+REM \return			The Wimp colour of the icon's foreground
+:
+DEF FNicon_foreground_colour(!a%, a%!4)
+SYS "Wimp_GetIconState",,a%
+=((a%!24 AND &0F000000) >>> 24)
+
+
+REM Set the selected, shaded and deleted states of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be updated.
+REM \selected%			TRUE to select the icon; FALSE to deselect it.
+REM \shaded%			TRUE to shade the icon; FALSE to unshade it.
+REM \deleted%			TRUE to delete the icon; FALSE to undelete it.
+
+DEF PROCicon_set_state(!a%, a%!4, selected%, shaded%, deleted%)
+LOCAL eor%, clear%
+
+IF selected% THEN clear% += &200000 : eor% += &200000 ELSE clear% += &200000
+IF shaded% THEN clear% += &400000 : eor% += &400000 ELSE clear% += &400000
+IF deleted% THEN clear% += &800000 : eor% += &800000 ELSE clear% += &800000
+a%!8 = eor%
+a%!12 = clear%
+SYS "Wimp_SetIconState",,a%
+ENDPROC
 
 
 REM Set the selected state of an icon.
@@ -59,7 +124,7 @@ REM \selected%			TRUE to select the icon; FALSE to deselect it.
 DEF PROCicon_set_selected(!a%, a%!4, selected%)
 LOCAL eor%, clear%
 
-IF selected% THEN clear% += (1<<21) : eor% += (1<<21) ELSE clear% += (1<<21) : eor% += (0<<21)
+IF selected% THEN clear% += &200000 : eor% += &200000 ELSE clear% += &200000
 a%!8 = eor%
 a%!12 = clear%
 SYS "Wimp_SetIconState",,a%
@@ -75,7 +140,7 @@ REM \shaded%			TRUE to shade the icon; FALSE to unshade it.
 DEF PROCicon_set_shaded(!a%, a%!4, shaded%)
 LOCAL eor%, clear%
 
-IF shaded% THEN clear% += (1<<22) : eor% += (1<<22) ELSE clear% += (1<<22) : eor% += (0<<22)
+IF shaded% THEN clear% += &400000 : eor% += &400000 ELSE clear% += &400000
 a%!8 = eor%
 a%!12 = clear%
 SYS "Wimp_SetIconState",,a%
@@ -91,10 +156,62 @@ REM \deleted%			TRUE to delete the icon; FALSE to undelete it.
 DEF PROCicon_set_deleted(!a%, a%!4, deleted%)
 LOCAL eor%, clear%
 
-IF deleted% THEN clear% += (1<<23) : eor% += (1<<23) ELSE clear% += (1<<23) : eor% += (0<<23)
+IF deleted% THEN clear% += &800000 : eor% += &800000 ELSE clear% += &800000
 a%!8 = eor%
 a%!12 = clear%
 SYS "Wimp_SetIconState",,a%
+ENDPROC
+
+
+REM Set the foreground and background colours of an icon.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be updated.
+REM \param foreground%		The foreground Wimp colour for the icon.
+REM \param background%		The background Wimp colour for the icon.
+:
+DEF PROCicon_set_colours(!a%, a%!4, foreground%, background%)
+LOCAL eor%, clear%
+
+a%!8 = 0
+a%!12 = &FF000000
+SYS "Wimp_SetIconState",,a%
+
+a%!8 = (background% << 28) + (foreground% << 24)
+a%!12 = a%!8
+SYS "Wimp_SetIconState",,a%
+ENDPROC
+
+
+REM Increment the numeric value in an icon by one, up to a given limit.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be updated.
+REM \param limit%		The maximum value to increment to.
+:
+DEF PROCicon_increment_value(window%, icon%, limit%)
+LOCAL value%
+
+value% = VAL($FNicon_indirection(window%, icon%))
+value% += 1
+IF value% <= limit% THEN $FNicon_indirection(window%, icon%) = STR$(value%)
+PROCforce_icon_redraw(window%, icon%)
+ENDPROC
+
+
+REM Decrement the numeric value in an icon by one, down to a given limit.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be updated.
+REM \param limit%		The minimum value to decrement to.
+:
+DEF PROCicon_decrement_value(window%, icon%,l%)
+LOCAL value%
+
+value% = VAL($FNicon_indirection(window%, icon%))
+value% -= 1
+IF value% >= limit% THEN $FNicon_indirection(window%, icon%) = STR$(value%)
+PROCforce_icon_redraw(window%, icon%)
 ENDPROC
 
 
@@ -141,4 +258,40 @@ DEF PROCicon_redraw(!a%, a%!4)
 SYS "Wimp_GetIconState",,a%
 SYS "Wimp_ForceRedraw", !a%, a%!8, a%!12, a%!16, a%!20
 ENDPROC
+
+
+REM Force an icon to be redrawn immediately via Wimp_UpdateWindow.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to be redrawn.
+:
+DEF PROCicon_immediate_redraw(!a%, a%!4)
+LOCAL more%
+
+SYS "Wimp_GetIconState",,a%
+a%!4 = !a%
+SYS "Wimp_UpdateWindow",,a%+4 TO more%
+WHILE more%
+	SYS "Wimp_GetRectangle",,a% TO more%
+ENDWHILE
+ENDPROC
+
+
+REM Create a standard Iconbar icon, returning the handle of the icon.
+REM
+REM \param window%		The window to create the icon in (-1 for iconbar).
+REM \param sprite$		The name of the sprite to use, from the Wimp Pool.
+REM \return			The handle of the newly created icon.
+:
+DEF FNicon_create_standard_bar(!a%, sprite$)
+LOCAL handle%
+
+a%!4 = 0
+a%!8 = 0
+a%!12 = 68
+a%!16 = 69
+a%!20 = &3002
+$(a% + 24) = sprite$
+SYS "Wimp_CreateIcon",,a% TO handle%
+=handle%
 

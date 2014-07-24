@@ -35,6 +35,7 @@ WHILE ?p%<>0
 ENDWHILE
 =a$
 :
+REM String: FNstring_pathname(file$)
 DEF FNleaf_name(f$)
 IF INSTR(f$,":") THEN f$=MID$(f$,INSTR(f$,":")+1)
 WHILE INSTR(f$,".")
@@ -42,6 +43,7 @@ WHILE INSTR(f$,".")
 ENDWHILE
 =f$
 :
+REM String: FNstring_leafname(file$)
 DEF FNpath_name(f$)
 LOCAL p$
 WHILE INSTR(f$,".")
@@ -185,6 +187,7 @@ ENDPROC
 :
 REM Interactive Help
 :
+REM Not Transferred
 DEF PROCsend_help(h$)
 q%!12=b%!8
 q%!16=&503
@@ -195,6 +198,7 @@ ENDPROC
 :
 REM Icon Handling
 :
+REM Icon: PROCicon_set_state(window%, icon%, selected%, shaded%, deleted%
 DEF PROCset_icon_state(!q%,q%!4,s%,h%,d%)
 LOCAL e%,c%
 IF s% THEN c%+=(1<<21) : e%+=(1<<21) ELSE c%+=(1<<21) : e%+=(0<<21)
@@ -205,10 +209,13 @@ q%!12=c%
 SYS "Wimp_SetIconState",,q%
 ENDPROC
 :
+REM Icon: FNicon_selected(window%, icon%)
 DEF FNicon_selected(!q%,q%!4) : SYS "Wimp_GetIconState",,q% : =((q%!24 AND (1<<21))<>0)
 :
+REM Icon: FNicon_shaded(window%, icon%)
 DEF FNicon_shaded(!q%,q%!4) : SYS "Wimp_GetIconState",,q% : =((q%!24 AND (1<<22))<>0)
 :
+REM Not transferred
 DEF FNicon_deleted(!q%,q%!4) : SYS "Wimp_GetIconState",,q% : =((q%!24 AND (1<<23))<>0)
 :
 REM Icon: FNicon_indirection(window%, icon%)
@@ -217,6 +224,7 @@ DEF FNicon_indirection(!a%,a%!4) : SYS "Wimp_GetIconState",,a% : =a%!28
 REM Icon: FNicon_validation(window%, icon%)
 DEF FNicon_validation(!a%,a%!4) : SYS "Wimp_GetIconState",,a% : =a%!32
 :
+REM Icon: PROCicon_set_colours(window%, icon%, foreground%, background%)
 DEF PROCset_icon_colours(!q%,q%!4,f%,b%)
 LOCAL e%,c%
 q%!8=0 : q%!12=(255<<24)
@@ -226,14 +234,17 @@ q%!12=q%!8
 SYS "Wimp_SetIconState",,q%
 ENDPROC
 :
+REM Icon: FNicon_background_colour(window%, icon%)
 DEF FNget_icon_background_colour(!q%,q%!4)
 SYS "Wimp_GetIconState",,q%
 =((q%!24 AND %1111<<28)>>>28)
 :
+REM Icon: FNicon_foreground_colour(window%, icon%)
 DEF FNget_icon_foreground_colour(!q%,q%!4)
 SYS "Wimp_GetIconState",,q%
 =((q%!24 AND %1111<<24)>>>24)
 :
+REM Icon: FNicon_create_standard_bar(window%, sprite$)
 DEF FNcreate_standard_bar_icon(!q%,i$)
 LOCAL h%
 q%!4=0
@@ -245,6 +256,7 @@ $(q%+24)=i$
 SYS "Wimp_CreateIcon",,q% TO h%
 =h%
 :
+REM Icon: PROCicon_increment(window%, icon%, limit%)
 DEF PROCincrement_icon_contents(w%,i%,l%)
 LOCAL v%
 v%=VAL($FNicon_indirection(w%,i%))
@@ -253,6 +265,7 @@ IF v%<=l% THEN $FNicon_indirection(w%,i%)=STR$(v%)
 PROCforce_icon_redraw(w%,i%)
 ENDPROC
 :
+REM Icon: PROCicon_decrement(window%, icon%, limit%)
 DEF PROCdecrement_icon_contents(w%,i%,l%)
 LOCAL v%
 v%=VAL($FNicon_indirection(w%,i%))
@@ -261,12 +274,13 @@ IF v%>=l% THEN $FNicon_indirection(w%,i%)=STR$(v%)
 PROCforce_icon_redraw(w%,i%)
 ENDPROC
 :
-REM Icon: FNicon_force_redraw(window%, icon%)
+REM Icon: PROCicon_force_redraw(window%, icon%)
 DEF PROCforce_icon_redraw(!q%,q%!4)
 SYS "Wimp_GetIconState",,q%
 SYS "Wimp_ForceRedraw",!q%,q%!8,q%!12,q%!16,q%!20
 ENDPROC
 :
+REM Icon: PROCicon_immediate_redraw(window%, icon%)
 DEF PROCimmediate_icon_redraw(!q%,q%!4)
 LOCAL m%
 SYS "Wimp_GetIconState",,q%

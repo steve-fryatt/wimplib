@@ -102,3 +102,34 @@ FOR loop% = 1 TO LEN(string$)
 NEXT loop%
 =string$
 
+
+REM Given a filename, return the leafname portion of the string (ie. everything
+REM following the final '.' in the string).
+REM 
+REM \param filename$		The filename to process.
+REM \return			The leafname portion of the filename.
+:
+DEF FNstring_leafname(filename$)
+IF INSTR(filename$, ":") THEN filename$ = MID$(filename$, INSTR(filename$, ":") + 1)
+
+WHILE INSTR(filename$, ".")
+	filename$ = MID$(filename$, INSTR(filename$, ".") + 1)
+ENDWHILE
+=filename$
+
+
+REM Given a filename, return the pathname portion of the string (ie. everything
+REM before the final '.' in the string).
+REM 
+REM \param filename$		The filename to process.
+REM \return			The pathname portion of the filename.
+:
+DEF FNstring_pathname(filename$)
+LOCAL pathname$
+
+WHILE INSTR(filename$, ".")
+	pathname$ += LEFT$(filename$, INSTR(filename$, ".") - 1) + "."
+	filename$ = MID$(filename$, INSTR(filename$, ".") + 1)
+ENDWHILE
+=LEFT$(pathname$)
+
