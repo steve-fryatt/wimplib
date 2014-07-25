@@ -22,7 +22,7 @@ REM
 REM See the Licence for the specific language governing
 REM permissions and limitations under the Licence.
 :
-REM Tenplate handling library
+REM Template handling library
 REM
 REM This library leaks 12 bytes of memory each time PROCtemplate_open() is
 REM called.
