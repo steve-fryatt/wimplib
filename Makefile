@@ -91,7 +91,9 @@ BASDIR := BASIC
 # Set up the named target files.
 
 README := ReadMe,fff
-LIBRARIES := Config.bbt Date.bbt Icon.bbt LegacyWimp.bbt Legacy3D.bbt Resources.bbt String.bbt Url.bbt WimpError.bbt WimpLib.bbt WimpSprite.bbt Window.bbt
+LIBRARIES := Config.bbt Date.bbt Icon.bbt LegacyWimp.bbt Legacy3D.bbt Resources.bbt	\
+             String.bbt Template.bbt Url.bbt WimpError.bbt WimpLib.bbt WimpSprite.bbt	\
+             Window.bbt
 
 # Set up the source files.
 

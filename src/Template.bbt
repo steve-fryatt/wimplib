@@ -1,0 +1,71 @@
+REM >BASIC:Template
+REM
+REM Copyright 2001-2014, Stephen Fryatt (info@stevefryatt.org.uk)
+REM
+REM This file is part of WimpLib:
+REM
+REM   http://www.stevefryatt.org.uk/software/
+REM
+REM Licensed under the EUPL, Version 1.1 only (the "Licence");
+REM You may not use this work except in compliance with the
+REM Licence.
+REM
+REM You may obtain a copy of the Licence at:
+REM
+REM   http://joinup.ec.europa.eu/software/page/eupl
+REM
+REM Unless required by applicable law or agreed to in
+REM writing, software distributed under the Licence is
+REM distributed on an "AS IS" basis, WITHOUT WARRANTIES
+REM OR CONDITIONS OF ANY KIND, either express or implied.
+REM
+REM See the Licence for the specific language governing
+REM permissions and limitations under the Licence.
+:
+REM Tenplate handling library
+REM
+REM This library leaks 12 bytes of memory each time PROCtemplate_open() is
+REM called.
+
+
+REM Open a template file for use.
+REM
+REM Each call claims 12 bytes from the BASIC heap, which is not returned
+REM at any point.
+REM
+REM \param file$		The name of the template file to be opened. 
+:
+DEF PROCtemplate_open(file$)
+SYS "Wimp_OpenTemplate",,file$
+DIM TemplateName% 12
+ENDPROC
+
+
+REM Close a template file which has been opened.
+:
+DEF PROCtemplate_close
+SYS "Wimp_CloseTemplate"
+ENDPROC
+
+
+REM Load a window definition from a template into a supplied block of memory.
+REM Note that the supplied buffer IS NOT BOUNDS CHECKED.
+REM
+REM \param name$		The name of the template to be loaded.
+REM \param buffer%		Pointer to a buffer to take the definition.
+REM \param workspace%		Pointer to indirected workspace; updated on exit
+REM				to point to the first free byte after new data.
+REM \param size%		The workspace size; updated on exit to show the
+REM				remaining size.
+REM \param fonts%		Pointer to the font reference array, or -1.
+:
+DEF PROCtemplate_load(name$, buffer%, RETURN workspace%, RETURN size%, fonts%)
+LOCAL end%
+
+$TemplateName%=LEFT$(name$ + STRING$(12, " "), 12)
+SYS "Wimp_LoadTemplate",,buffer%, workspace%, workspace% + size%, fonts%, TemplateName%, 0 TO ,,end%
+
+size% -= (end% - workspace%)
+workspace% = end%
+ENDPROC
+

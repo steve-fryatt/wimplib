@@ -154,11 +154,13 @@ DEF FNtitle_indirection(!a%) : SYS "Wimp_GetWindowInfo",,(a% OR 1) : =a%!76
 :
 REM Template Handling
 :
+REM Template: PROCtemplate_open(file$)
 DEF PROCopen_templates(f$)
 SYS "Wimp_OpenTemplate",,f$
 DIM template_name% 12
 ENDPROC
 :
+REM Template: PROCtemplate_load(name$, buffer%, RETURN workspace%, RETURN size%, fonts%)
 DEF PROCload_template(n$,d%,RETURN i%,RETURN l%,f%)
 LOCAL n%
 $template_name%="            "
@@ -168,6 +170,8 @@ l%-=(n%-i%)
 i%=n%
 ENDPROC
 :
+REM Not Transferred.
+REM *** Appears to be seriously buggy! ***
 DEF FNload_template_definition(n$,RETURN i%,RETURN l%,f%,s%)
 LOCAL n%,d%,e%
 $template_name%="            "
@@ -181,6 +185,7 @@ l%-=(n%-i%)
 i%=n%
 =d%
 :
+REM Template: PROCtemplate_close
 DEF PROCclose_templates
 SYS "Wimp_CloseTemplate"
 ENDPROC
@@ -293,12 +298,14 @@ ENDPROC
 :
 REM Caret Handling
 :
+REM Icon: PROCicon_put_caret_at_end(window%, icon%)
 DEF PROCput_caret_at_end(!q%,q%!4)
 LOCAL l%
 IF q%!4>-1 THEN SYS "Wimp_GetIconState",,q% : l%=LEN($(q%!28)) ELSE l%=0
 SYS "Wimp_SetCaretPosition",!q%,q%!4,,,-1,l%
 ENDPROC
 :
+REM Icon: FNicon_test_for_caret(window%, icon%)
 DEF FNis_caret_in_icon(w%,i%)
 SYS "Wimp_GetCaretPosition",,q%
 IF i%=-1 THEN q%!4=-1

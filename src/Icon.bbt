@@ -249,6 +249,38 @@ PROCicon_redraw(window%, icon%)
 ENDPROC
 
 
+REM Place the caret at the end of an icon, or give a window focus.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to take the caret, or
+REM 				-1 to give a window focus on the work area.
+:
+DEF PROCicon_put_caret_at_end(!a%, a%!4)
+LOCAL text$, length%
+
+IF a%!4 > -1 THEN
+	SYS "Wimp_GetIconState",,a%
+	SYS "XOS_GenerateError", a% + 28 TO text$
+	length% = LEN(text$)
+ELSE
+	length% = 0
+ENDIF
+SYS "Wimp_SetCaretPosition", !a%, a%!4,,, -1, length%
+ENDPROC
+
+
+REM Test to see if an icon contains the caret.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to test, or -1 to test
+REM				if a window contains the caret.
+:
+DEF FNicon_test_for_caret(window%, icon%)
+SYS "Wimp_GetCaretPosition",,a%
+IF icon%=-1 THEN a%!4 = -1
+=((!a% = window%) AND (a%!4 = icon%))
+
+
 REM Force an icon to be redrawn.
 REM
 REM \param window%		The handle of the window containing the icon.
