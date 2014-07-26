@@ -31,7 +31,8 @@ REM Initialise the error handler, saving the name of the client task and the
 REM sprite that it uses.
 REM
 REM \param taskname$		The name of the client task.
-REM \param sprite$		The name of the sprite used by the task.
+REM \param sprite$		The name of the sprite used by the task, or ""
+REM 				to use the default sprite.
 :
 DEF PROCwimperror_initialise(taskname$, sprite$)
 WimpErrorTaskName$=taskname$
@@ -70,7 +71,8 @@ REM				buttons are used.
 DEF FNwimperror_report(message$, type%, buttons%, buttons$)
 LOCAL result%, flags%
 
-flags% = &0100 + ((type% AND %111) << 9) + (buttons% AND %11)
+flags% = ((type% AND %111) << 9) + (buttons% AND %11)
+IF WimpErrorTaskSprite$ <> "" THEN flags% += &100
 
 !a% = 255
 $(a% + 4) = message$ + CHR$(0)

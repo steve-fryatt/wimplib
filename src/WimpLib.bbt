@@ -478,12 +478,14 @@ ENDPROC
 :
 REM Error Handling
 :
+REM Not transferred
 DEF PROCreport(m$,t$)
 !q%=255
 $(q%+4)=m$+CHR$(0)
 SYS "Wimp_ReportError",q%,%10001,"Message from "+t$
 ENDPROC
 :
+REM Not transferred
 DEF PROCreport_fatal(m$,t$,f%)
 LOCAL l%
 IF f% l%=%10 ELSE l%=%10001 : t$="Message from "+t$
@@ -492,6 +494,7 @@ $(q%+4)=m$+CHR$(0)
 SYS "Wimp_ReportError",q%,l%,t$
 ENDPROC
 :
+REM Not transferred
 DEF FNerror(t$)
 LOCAL c%
 SYS "Hourglass_Smash"
