@@ -98,7 +98,7 @@ LOCAL result%
 SYS "Hourglass_Smash"
 
 !a% = ERR
-$(a% + 4) = task_name$ + " has suffered an internal error (" + REPORT$ + "; error code " + STR$(ERL) + ")" + CHR$(0)
+$(a% + 4) = WimpErrorTaskName$ + " has suffered an internal error (" + REPORT$ + "; error code " + STR$(ERL) + ")" + CHR$(0)
 SYS "Wimp_ReportError", a%, &0703, WimpErrorTaskName$, WimpErrorTaskSprite$, 1, 0 TO ,result%
 
 =(result% = 2)

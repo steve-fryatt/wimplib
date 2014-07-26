@@ -34,7 +34,7 @@ REM \return			The territory name.
 :
 DEF FNresources_territory_name
 LOCAL territory%, name$
-SYS "Territory_Number" TO t%
+SYS "Territory_Number" TO territory%
 SYS "Territory_NumberToName", territory%, a%, 256
 SYS "XOS_GenerateError",a% TO name$
 =name$
