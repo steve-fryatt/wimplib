@@ -313,16 +313,19 @@ IF i%=-1 THEN q%!4=-1
 :
 REM Menu Handling
 :
+REM Menu: PROCmenu_create()
 DEF PROCdisplay_menu(m%,x%,y%)
 menu_up%=m%
 SYS "Wimp_CreateMenu",,m%,x%-64,y%
 ENDPROC
 :
+REM Menu: PROCmenu_create_iconbar()
 DEF PROCdisplay_bar_menu(m%,i%,d%,x%)
 menu_up%=m%
 SYS "Wimp_CreateMenu",,m%,x%-64,96+(i%*44)+(d%*24)
 ENDPROC
 :
+REM Menu: PROCmenu_create_popup()
 DEF PROCdisplay_icon_menu(m%,w%,i%)
 !q%=w%
 SYS "Wimp_GetWindowState",,q%
@@ -333,25 +336,31 @@ menu_up%=m%
 SYS "Wimp_CreateMenu",,m%,q%!4+(q%!116-q%!20),q%!16+(q%!120-q%!20)
 ENDPROC
 :
+REM Not transferred
 DEF PROCset_standard_menu_title(m%,t$)
 $m%=t$:m%?12=7
 ENDPROC
 :
+REM Not transferred
 DEF PROCset_standard_menu_text(m%,i%,t$)
 $((m%+28)+(24*i%)+12)=LEFT$(t$,11)
 ENDPROC
 :
+REM Menu: FNmenu_get_text()
 DEF FNget_standard_menu_text(m%,i%)
 =$((m%+28)+(24*i%)+12)
 :
+REM Not transferred
 DEF PROCset_indirected_menu_text(m%,i%,t%,l%)
 !(m%+28+(i%*24)+12)=t%
 !(m%+28+(i%*24)+20)=l%
 ENDPROC
 :
+REM Menu: FNmenu_indirection()
 DEF FNmenu_indirection(menu%,item%)
 =!(menu%+28+(item%*24)+12)
 :
+REM Menu: PROCmenu_set_state()
 DEF PROCset_menu_state(h%,i%,t%,s%)
 LOCAL a%
 a%=h%+28+(i%*24)+10
@@ -360,23 +369,27 @@ a%=h%+28+(i%*24)
 IF t% THEN?a%=(?a% OR 1) ELSE ?a%=(?a% AND 254)
 ENDPROC
 :
+REM Not transferred
 DEF PROCset_menu_end(h%,i%,e%)
 LOCAL a%
 a%=h%+28+(i%*24)
 IF e% THEN?a%=(?a% OR 128) ELSE ?a%=(?a% AND 127)
 ENDPROC
 :
+REM Not transferred
 DEF PROCset_menu_width(h%,w%)
 h%!16=(w%+1)*16
 ENDPROC
 :
 REM Menu Creation
 :
+REM Not transferred
 DEF PROCinit_new__menu(m%,RETURN w%,RETURN e%,t$)
 w%=LEN(t$):$m%=t$:m%?12=7:m%?13=2:m%?14=7:m%?15=0
 m%!16=(w%+1)*16:m%!20=44:m%!24=0:e%=m%+28
 ENDPROC
 :
+REM Not transferred
 DEF PROCstandard_menu_item(m%,RETURN w%,RETURN e%,t$,t%,dt%,s%,wn%,lt%,li%)
 LOCAL f%,d%
 IF LEN(t$)<12 THEN
@@ -390,18 +403,22 @@ ELSE
 ENDIF
 ENDPROC
 :
+REM Not transferred
 DEF FNmenu_flags(t%,sp%,br%,c%,an%,i%,r%,h%,sh%,fc%,bc%,ft%)
 LOCAL f%
 f%=t%+(sp%<<1)+(br%<<2)+(c%<<3)+(1<<5)+(an%<<6)+(i%<<8)+(r%<<9)+(h%<<11)+(sh%<<22)
 IF an%=0 THEN f%+=(fc%<<24)+(bc%<<28) ELSE f%+=(ft%<<24)
 =f%
 :
+REM Not transferred
 DEF FNstandard_menu_flags(s%)
 =FNmenu_flags(1,0,0,0,0,0,0,0,s%,7,0,0)
 :
+REM Not transferred
 DEF FNcolour_menu_flags(f%,b%)
 =FNmenu_flags(1,0,0,0,0,0,0,0,0,f%,b%,0)
 :
+REM Not transferred
 DEF PROCmenu_item(m%,RETURN w%,RETURN e%,t$,t%,d%,lt%,wr%,me%,lk%,fl%,i1%,i2%,i3%)
 LOCAL f%,ist%
 f%=t%+(d%<<1)+(wr%<<2)+(me%<<3)+(lt%<<7)
@@ -416,6 +433,7 @@ IF LEN(t$)>w% THENw%=LEN(t$)
 m%!16=(w%+1)*16
 ENDPROC
 :
+REM Menu: PROCmenu_load_templates(file$, info%)
 DEF PROCload_menu_block(f$, r%)
 LOCAL p%,y%,z%,l%,c%,t%
 SYS "OS_File",5,f$ TO ,,,,l%

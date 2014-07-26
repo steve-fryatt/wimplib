@@ -1,0 +1,234 @@
+REM >BASIC:Menu
+REM
+REM Copyright 2001-2014, Stephen Fryatt (info@stevefryatt.org.uk)
+REM
+REM This file is part of WimpLib:
+REM
+REM   http://www.stevefryatt.org.uk/software/
+REM
+REM Licensed under the EUPL, Version 1.1 only (the "Licence");
+REM You may not use this work except in compliance with the
+REM Licence.
+REM
+REM You may obtain a copy of the Licence at:
+REM
+REM   http://joinup.ec.europa.eu/software/page/eupl
+REM
+REM Unless required by applicable law or agreed to in
+REM writing, software distributed under the Licence is
+REM distributed on an "AS IS" basis, WITHOUT WARRANTIES
+REM OR CONDITIONS OF ANY KIND, either express or implied.
+REM
+REM See the Licence for the specific language governing
+REM permissions and limitations under the Licence.
+:
+REM Menu handling library
+REM
+REM The variable a% is reqired to point to 256 bytes of memory.
+
+
+REM Initialise the menu system.
+:
+DEF PROCmenu_initialise
+MenuOpen% = 0
+ENDPROC
+
+
+REM Load a block of menu templates from file into memory, allocating space from
+REM the BASIC heap and initialising all pointers.
+REM
+REM \param file$		The name of the file containing the definitions.
+REM \param into%		Information transfer block. On entry contains
+REM				list of dialogue box handles in required order;
+REM				on exit contains list of menu handles.
+:
+DEF PROCmenu_load_templates(file$, info%)
+LOCAL data%, current%, z%, size%, dbox%, menu%, next%
+
+REM Allocate memory and load the menu file.
+
+SYS "OS_File", 5, file$ TO ,,,,size%
+DIM data% size%
+SYS "OS_File", 255, file$, data%
+
+REM Insert the dialogue box pointers.
+
+dbox% = 0
+
+IF !data% >- 1 THEN
+	current% = (data% + !data%)
+	REPEAT
+		next% = !current%
+		!current% = info%!dbox%
+		dbox% += 4
+
+		IF next% >- 1 THEN current% = data% + next%
+	UNTIL next% = -1
+ENDIF
+
+REM Insert the indirection pointers.
+
+IF data%!4 >- 1 THEN
+	current% = data% + (data%!4)
+	WHILE !current% >- 1
+		!(data% + !current%) = current% + 4
+		current% = (current% + (!(data% + !current% + 8) + 7)) AND &FFFFFFFC
+	ENDWHILE
+ENDIF
+
+REM Insert the validation pointers.
+
+IF data%!8 > -1 THEN
+	current% = data% + (data%!8)
+	WHILE !current% >- 1
+		!(data% + !current%) = current% + 8
+		current% = (current% + !(current% + 4))
+	ENDWHILE
+ENDIF
+
+REM Collect together pointers to the menus, and link the submenus together.
+
+current% = data% + 20
+menu%=0
+
+REPEAT
+	info%!menu% = current%
+	z% = current% - 4
+
+	IF !z% > -1 THEN
+		next% = data% + (!z%)
+
+		WHILE next% >- 1
+			z% = !next%
+
+			IF z% > -1 THEN z% += data%
+			!next% = current%
+			next% = z%
+		ENDWHILE
+	ENDIF
+
+	current% = !(current% - 8)
+	IF current% > -1 THEN current% += data%
+
+	menu% += 4
+UNTIL current% =- 1
+ENDPROC
+
+
+REM Create and display a menu at the given coordinates on screen.
+REM
+REM \param menu%		The handle of the menu to create.
+REM \param x%			The X coordinate of the mouse pointer.
+REM \param y%			The Y coordinate of the mouse pointer.
+
+DEF PROCmenu_create(menu%,x%,y%)
+MenuOpen%=menu%
+SYS "Wimp_CreateMenu",,menu%, x% - 64, y%
+ENDPROC
+
+
+REM Create and display an iconbar menu at the given X coordinate on screen.
+REM The Y position is calculated from the menu's height.
+REM
+REM \param menu%		The handle of the menu to create.
+REM \param x%			The X coordinate of the mouse pointer.
+:
+DEF PROCmenu_create_iconbar(menu%, x%)
+LOCAL ptr%, height%
+
+ptr% = menu% + 4
+REPEAT
+	ptr% += 24
+	height% += menu%!20 + menu%!24
+	IF !ptr% AND &02 THEN height% += 24
+UNTIL !ptr% AND &80
+height% -= menu%!24
+
+MenuOpen% = menu%
+SYS "Wimp_CreateMenu",,menu%, x% - 64, 96 + height%
+ENDPROC
+
+
+REM Create and display a popup menu adjacent to an icon.
+REM
+REM \param menu%		The handle of the menu to create.
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to use.
+:
+DEF PROCmenu_create_popup(menu%,window%,icon%)
+!a% = window%
+SYS "Wimp_GetWindowState",,a%
+
+a%!100 = window%
+a%!104 = icon%
+SYS "Wimp_GetIconState",,a% + 100
+
+MenuOpen% = menu%
+SYS "Wimp_CreateMenu",,menu%, a%!4 + (a%!116 - a%!20), a%!16 + (a%!120 - a%!20)
+ENDPROC
+
+
+REM Record that a menu has closed.
+:
+DEF PROCmenu_closed
+MenuOpen% = 0
+ENDPROC
+
+
+REM Return the handle of the last menu to be opened.
+REM
+REM \return			The handle of the last menu.
+
+DEF FNmenu_current_handle
+=MenuOpen%
+
+
+REM Return the text from a menu item.
+REM 
+REM \param menu%		The handle of the menu containing the item.
+REM \param item%		The number of the menu item.
+REM \return			The text from the menu item.
+:
+DEF FNmenu_get_text(menu%, item%)
+LOCAL text%, text$
+
+IF !(menu% + 36 + (24 * item%)) AND &100 THEN
+	text% = FNmenu_indirection(menu%, item%)
+ELSE
+	text% = menu% + 40 + (24 * item%)
+ENDIF
+
+IF text% = 0 THEN = ""
+SYS "XOS_GenerateError", text% TO text$
+=text$
+
+
+REM Return the indirected text pointer for a menu item.
+REM
+REM \param menu%		The handle of the menu containing the item.
+REM \param item%		The number of the menu item.
+REM \return			The indirected text pointer for the item, or
+REM				0 if the item isn't indirected.
+:
+DEF FNmenu_indirection(menu%, item%)
+IF !(menu% + 36 + (item% * 24)) = 0 THEN =0
+=!(menu% + 40 + (item% * 24))
+
+
+REM Set the ticked and shaded states of a menu item.
+REM
+REM \param menu%		The handle of the menu containing the item.
+REM \param item%		The number of the menu item.
+REM \param tick%		TRUE to tick the item; FALSE to untick it.
+REM \param shade%		TRUE to shade the item; FALSE to unshade it.
+:
+DEF PROCmenu_set_state(menu%, item%, tick%, shade%)
+LOCAL ptr%
+
+ptr% = menu% + 38 + (item% * 24)
+IF shade% THEN ?ptr% = (?ptr% OR &40) ELSE ?ptr% = (?ptr% AND &BF)
+
+ptr% = menu% + 28 + (item% * 24)
+IF tick% THEN ?ptr% = (?ptr% OR &01) ELSE ?ptr% = (?ptr% AND &FE)
+ENDPROC
+
