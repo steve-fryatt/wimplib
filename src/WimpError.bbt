@@ -35,8 +35,8 @@ REM \param sprite$		The name of the sprite used by the task, or ""
 REM 				to use the default sprite.
 :
 DEF PROCwimperror_initialise(taskname$, sprite$)
-WimpErrorTaskName$=taskname$
-WimpErrorTaskSprite$=sprite$
+WimpErrorTaskName$ = taskname$
+WimpErrorTaskSprite$ = sprite$
 ENDPROC
 
 
@@ -52,7 +52,7 @@ REM \param buttons$		Comma-separated list of custom buttons, or "".
 DEF PROCwimperror_report(message$, type%, buttons%, buttons$)
 LOCAL dummy%
 
-dummy%=FNwimperror_report(message$,type%,buttons%,buttons$)
+dummy% = FNwimperror_report(message$,type%,buttons%,buttons$)
 ENDPROC
 
 
