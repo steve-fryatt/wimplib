@@ -30,7 +30,7 @@ REM called.
 
 REM Open a template file for use.
 REM
-REM Each call claims 12 bytes from the BASIC heap, which is not returned
+REM Each call claims 13 bytes from the BASIC heap, which is not returned
 REM at any point.
 REM
 REM \param file$		The name of the template file to be opened. 
@@ -62,7 +62,7 @@ REM \param fonts%		Pointer to the font reference array, or -1.
 DEF PROCtemplate_load(name$, buffer%, RETURN workspace%, RETURN size%, fonts%)
 LOCAL end%
 
-$TemplateName%=LEFT$(name$ + STRING$(12, " "), 12)
+$TemplateName%=LEFT$(name$ + STRING$(12, CHR$(13)), 12)
 SYS "Wimp_LoadTemplate",,buffer%, workspace%, workspace% + size%, fonts%, TemplateName%, 0 TO ,,end%
 
 size% -= (end% - workspace%)
