@@ -195,7 +195,7 @@ LOCAL value%
 value% = VAL($FNicon_indirection(window%, icon%))
 value% += 1
 IF value% <= limit% THEN $FNicon_indirection(window%, icon%) = STR$(value%)
-PROCforce_icon_redraw(window%, icon%)
+PROCicon_redraw(window%, icon%)
 ENDPROC
 
 
@@ -211,7 +211,7 @@ LOCAL value%
 value% = VAL($FNicon_indirection(window%, icon%))
 value% -= 1
 IF value% >= limit% THEN $FNicon_indirection(window%, icon%) = STR$(value%)
-PROCforce_icon_redraw(window%, icon%)
+PROCicon_redraw(window%, icon%)
 ENDPROC
 
 

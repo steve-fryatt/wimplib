@@ -48,7 +48,7 @@ REM \return			The territory path, with trailing .
 :
 DEF FNresources_find_territory_folder(path$)
 LOCAL folder$, type%
-folder$ = path$ + "." + FNterritory_name
+folder$ = path$ + "." + FNresources_territory_name
 SYS "XOS_File", 5, folder$ TO type%
 IF type% < 2 OR type% > 3 THEN folder$ = path$ + ".UK"
 =folder$ + "."
