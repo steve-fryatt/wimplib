@@ -105,19 +105,17 @@ SYS "Wimp_CloseWindow",,a%
 ENDPROC
 
 
-
-
 REM Open a window nested inside an already open parent window.
 REM
 REM \param window%		The handle of the window to open.
 REM \param parent%		The handle of the parent window.
 :
 DEF PROCwindow_open_nested(!a%, parent%)
-:
 SYS "Wimp_GetWindowState",,a%
 a%!28 = -1
 SYS "Wimp_OpenWindow",,a%, &4B534154, parent%, &0
 ENDPROC
+
 
 REM Move a window into the space occupied by an icon in an already open
 REM parent window.
@@ -131,7 +129,6 @@ REM				hand side of the child window (for a scrollbar).
 REM \param behind%		The handle of a window to open behind.
 :
 DEF PROCwindow_open_nested_in_icon(!a%, parent%, icon%, margin%, behind%)
-:
 a%!100 = parent%
 SYS "Wimp_GetWindowState",, a% + 100
 a%!200 = parent%
