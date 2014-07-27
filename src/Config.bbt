@@ -141,8 +141,8 @@ REM
 REM \param item$		The name of the option to read.
 REM \return			The current value assigned to the option.
 :
-DEF PROCconfig_read_real(item$)
-=VAL(PROCconfig_read_string(item$))
+DEF FNconfig_read_real(item$)
+=VAL(FNconfig_read_string(item$))
 
 
 REM Read the value of an integer configuration option.
@@ -150,8 +150,8 @@ REM
 REM \param item$		The name of the option to read.
 REM \return			The current value assigned to the option.
 :
-DEF PROCconfig_read_integer(item$)
-=INT(VAL(PROCconfig_read_string(item$)))
+DEF FNconfig_read_integer(item$)
+=INT(VAL(FNconfig_read_string(item$)))
 
 
 REM Read the value of a boolean configuration option.
@@ -159,10 +159,10 @@ REM
 REM \param item$		The name of the option to read.
 REM \return			The current value assigned to the option.
 :
-DEF PROCconfig_read_boolean(item$)
+DEF FNconfig_read_boolean(item$)
 LOCAL result%
 
-CASE PROCconfig_read_string(item$) OF
+CASE FNconfig_read_string(item$) OF
 WHEN "Off"	: result% = FALSE
 WHEN "On"	: result% = TRUE
 OTHERWISE	: ERROR 255, "Unrecognised option type"
@@ -175,7 +175,7 @@ REM
 REM \param item$		The name of the option to read.
 REM \return			The current value assigned to the option.
 :
-DEF PROCconfig_read_string(item$)
+DEF FNconfig_read_string(item$)
 LOCAL loop%, result$
 
 FOR loop% = 0  TO ConfigOptionCount% - 1
