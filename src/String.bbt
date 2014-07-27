@@ -31,7 +31,7 @@ REM
 REM \param string%		Pointer to the string in memory.
 REM \return			The string extracted from memory.
 :
-DEF FNstring_read((string%)
+DEF FNstring_read(string%)
 LOCAL string$
 SYS "XOS_GenerateError", string% TO string$
 =string$
