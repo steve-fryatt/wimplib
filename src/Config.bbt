@@ -27,7 +27,7 @@ REM
 REM The variable a% is reqired to point to 256 bytes of memory.
 
 
-REM Initialsse the config module.
+REM Initialise the config module.
 REM
 REM \param options%		The number of options to allocate space for.
 REM \param app_name$		The name of the client application.
