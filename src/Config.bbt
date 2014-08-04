@@ -193,7 +193,7 @@ ENDPROC
 REM Save the current configuration option settings to disc.
 REM
 REM \param file$		The file to save the settings to.
-
+:
 DEF PROCconfig_save_file(file$)
 LOCAL file%, loop%, value$
 
