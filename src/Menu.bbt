@@ -164,7 +164,7 @@ a%!104 = icon%
 SYS "Wimp_GetIconState",,a% + 100
 
 MenuOpen% = menu%
-SYS "Wimp_CreateMenu",,menu%, a%!4 + (a%!116 - a%!20), a%!16 + (a%!120 - a%!20)
+SYS "Wimp_CreateMenu",,menu%, a%!4 + (a%!116 - a%!20), a%!16 + (a%!120 - a%!24)
 ENDPROC
 
 

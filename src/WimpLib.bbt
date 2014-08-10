@@ -333,7 +333,7 @@ q%!100=w%
 q%!104=i%
 SYS "Wimp_GetIconState",,q%+100
 menu_up%=m%
-SYS "Wimp_CreateMenu",,m%,q%!4+(q%!116-q%!20),q%!16+(q%!120-q%!20)
+SYS "Wimp_CreateMenu",,m%,q%!4+(q%!116-q%!20),q%!16+(q%!120-q%!24)
 ENDPROC
 :
 REM Not transferred
