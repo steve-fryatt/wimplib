@@ -205,7 +205,7 @@ REM \param window%		The handle of the window containing the icon.
 REM \param icon%		The number of the icon to be updated.
 REM \param limit%		The minimum value to decrement to.
 :
-DEF PROCicon_decrement_value(window%, icon%,l%)
+DEF PROCicon_decrement_value(window%, icon%, limit%)
 LOCAL value%
 
 value% = VAL($FNicon_indirection(window%, icon%))
