@@ -60,7 +60,7 @@ WHEN &4E383 : REM Message_URIReturnResult
 		SYS "URI_RequestURI", 0, a%, 255, message%!24 TO ,,len%
 		a%?len% = 13
 
-		IF FNurl_ant_load($q%) THEN PROCwimperror_report(FNmessage_lookup("URLFailed"), 1, %01, "")
+		IF FNurl_ant_load($a%) THEN PROCwimperror_report(FNmessage_lookup("URLFailed"), 1, %01, "")
 	ENDIF
 WHEN &4AF80 : REM Message_ANTOpenURL
 	SYS "XOS_GenerateError", message% + 20 TO url$
