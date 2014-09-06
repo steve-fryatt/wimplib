@@ -92,8 +92,8 @@ BASDIR := BASIC
 
 README := ReadMe,fff
 LIBRARIES := Config.bbt Date.bbt Icon.bbt LegacyWimp.bbt Legacy3D.bbt Menu.bbt		\
-             Resources.bbt String.bbt Template.bbt Url.bbt WimpError.bbt WimpLib.bbt	\
-             WimpSprite.bbt Window.bbt
+             Message.bbt Resources.bbt String.bbt Template.bbt Url.bbt WimpError.bbt	\
+             WimpLib.bbt WimpSprite.bbt Window.bbt
 
 # Set up the source files.
 

@@ -51,6 +51,45 @@ IF (a%!24 AND &100) = 0 THEN =0
 =a%!32
 
 
+REM Get the content of a command from an icon's validation string.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon of interest.
+REM \param command$		The command for which to return the value.
+REM \return			The content of the command, or "" if not found.
+:
+DEF FNicon_validation_command(window%, icon%, command$)
+LOCAL validation%, start%, found%, ucase%, text$
+
+validation% = FNicon_validation(window%, icon%)
+IF validation% = 0 THEN = ""
+
+SYS "Territory_UpperCaseTable", -1 TO ucase%
+
+command$ = CHR$(ucase%?ASC(command$))
+
+start% = TRUE
+found% = FALSE
+text$ = ""
+
+WHILE (?validation% >= 32) AND (?validation% <> ASC(";") OR found% = FALSE)
+	IF ?validation% = ASC(";") THEN
+		start% = TRUE
+	ELSE
+		IF start% AND (CHR$(ucase%?(?validation%)) = command$) THEN
+			found% = TRUE
+		ELSE
+			IF found% THEN text$ += CHR$(?validation%)
+		ENDIF
+
+		start% = FALSE
+	ENDIF
+
+	validation% += 1
+ENDWHILE
+=text$
+
+
 REM Get the selected state of an icon.
 REM
 REM \param window%		The handle of the window containing the icon.

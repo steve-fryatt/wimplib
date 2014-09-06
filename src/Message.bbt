@@ -1,0 +1,75 @@
+REM >BASIC:WimpLib
+REM
+REM Copyright 2014, Stephen Fryatt (info@stevefryatt.org.uk)
+REM
+REM This file is part of WimpLib:
+REM
+REM   http://www.stevefryatt.org.uk/software/
+REM
+REM Licensed under the EUPL, Version 1.1 only (the "Licence");
+REM You may not use this work except in compliance with the
+REM Licence.
+REM
+REM You may obtain a copy of the Licence at:
+REM
+REM   http://joinup.ec.europa.eu/software/page/eupl
+REM
+REM Unless required by applicable law or agreed to in
+REM writing, software distributed under the Licence is
+REM distributed on an "AS IS" basis, WITHOUT WARRANTIES
+REM OR CONDITIONS OF ANY KIND, either express or implied.
+REM
+REM See the Licence for the specific language governing
+REM permissions and limitations under the Licence.
+:
+REM Message File Handling Library
+
+
+REM Initialise the message file, loading the data into memory ready for use.
+REM
+REM \param file$		The filename of the message file.
+:
+DEF PROCmessage_initialise(file$)
+LOCAL size%, flags%, buffer%
+
+DIM MessageBlock% 16
+SYS "MessageTrans_FileInfo",,file$ TO flags%,,size%
+
+DIM buffer% size%
+SYS "MessageTrans_OpenFile",MessageBlock%, file$, buffer%
+ENDPROC
+
+
+REM Look up a simple message token in the file, returning the message text.
+REM
+REM \param token$		The token to look up.
+REM \return			The corresponding message text.
+:
+DEF FNmessage_lookup(token$)
+LOCAL text$
+
+IF token$ = "" THEN = ""
+
+SYS "MessageTrans_Lookup", MessageBlock%, token$ TO ,,text$
+=text$
+
+
+REM Look up a simple message token in the file, returning the message text
+REM and an indication of whether the lookup succeeded.
+REM
+REM \param token$		The token to look up.
+REM \param text$		Return the corresponding message text.
+REM \return			TRUE if the lookup succeeded; FALSE if the token
+REM				wasn't found.
+:
+DEF FNmessage_lookup_result(token$, RETURN text$)
+LOCAL flags%
+
+IF token$ = "" THEN text$ = "" : =FALSE
+
+SYS "XMessageTrans_Lookup", MessageBlock%, token$ TO ,,text$; flags%
+IF (flags% AND 1) = 0 THEN =TRUE
+
+token$ = ""
+=FALSE
+
