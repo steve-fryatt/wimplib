@@ -429,10 +429,11 @@ icon%=FNcreate_icon(whan%,0,-52,144,48,"Name:",0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,7
 icon%=FNcreate_icon(whan%,0,-104,144,48,"Purpose:",0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,7,0)
 icon%=FNcreate_icon(whan%,0,-156,144,48,"Author:",0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,7,0)
 icon%=FNcreate_icon(whan%,0,-208,144,48,"Version:",0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,7,0)
-icon%=FNcreate_icon(whan%,148,-52,528,48,"",name%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,148,-52,384,48,"",name%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
 icon%=FNcreate_icon(whan%,148,-104,528,48,"",desc%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
 icon%=FNcreate_icon(whan%,148,-156,528,48,"",auth%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
 icon%=FNcreate_icon(whan%,148,-208,528,48,"",vers%,-1,len%,1,0,1,1,1,1,1,0,0,0,0,0,0,7,0)
+icon%=FNcreate_icon(whan%,536,-52,140,48,"Website",0,0,0,1,0,1,1,1,1,0,0,9,1,0,0,0,7,12)
 =whan%
 :
 DEF PROCset_menu_state(handle%,item%,tick%,shade%)
@@ -476,4 +477,18 @@ ENDPROC
 :
 DEF PROCredraw_part(h%,x%,y%,a%,b%)
 SYS "Wimp_ForceRedraw",h%,x%,y%,x%+a%,y%+b%
+ENDPROC
+:
+REM These two routines are a bodge to allow the Url library to work with the
+REM three legacy apps Crosses, Master and Solitaire: they implement replacements
+REM for code in other parts of the newer WimpLib that is not currently linked
+REM in. The presence of a global variable app$, containing the application name,
+REM is assumed.
+:
+DEF FNmessage_lookup(token$)
+IF token$ = "URLFailed" THEN = "Could not find an application to launch the given URL." ELSE =""
+:
+DEF PROCwimperror_report(message$, type%, buttons%, buttons$)
+LOCAL return%
+return% = FNreport(255, message$, 1, app$, 0, 1)
 ENDPROC
