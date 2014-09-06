@@ -135,6 +135,7 @@ SYS "Wimp_CreateWindow",,safeblock% TO handle%
 DEF PROCopen_window(whan%)
 !safeblock%=whan%
 SYS "Wimp_GetWindowState",,safeblock%
+safeblock%!28=-1
 SYS "Wimp_OpenWindow",,safeblock%
 ENDPROC
 :
@@ -148,6 +149,7 @@ safeblock%!4=x%
 safeblock%!8=y%
 safeblock%!12=x%+w%
 safeblock%!16=y%+h%
+safeblock%!28=-1
 SYS "Wimp_OpenWindow",,safeblock%
 ENDPROC
 :
