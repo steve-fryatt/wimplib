@@ -480,17 +480,4 @@ ENDPROC
 DEF PROCredraw_part(h%,x%,y%,a%,b%)
 SYS "Wimp_ForceRedraw",h%,x%,y%,x%+a%,y%+b%
 ENDPROC
-:
-REM These two routines are a bodge to allow the Url library to work with the
-REM three legacy apps Crosses, Master and Solitaire: they implement replacements
-REM for code in other parts of the newer WimpLib that is not currently linked
-REM in. The presence of a global variable app$, containing the application name,
-REM is assumed.
-:
-DEF FNmessage_lookup(token$)
-IF token$ = "URLFailed" THEN = "Could not find an application to launch the given URL." ELSE =""
-:
-DEF PROCwimperror_report(message$, type%, buttons%, buttons$)
-LOCAL return%
-return% = FNreport(255, message$, 1, app$, 0, 1)
-ENDPROC
+
