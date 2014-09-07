@@ -57,7 +57,7 @@ REM \param window%		The handle of the window containing the icon.
 REM \param icon%		The number of the icon to set.
 REM \param text$		The text to write to the icon.
 :
-DEF PROCset_indirected_icon_text(!a%, a%!4, text$)
+DEF PROCicon_set_indirected_text(!a%, a%!4, text$)
 SYS "Wimp_GetIconState",,a%
 IF ((a%!24 AND &100) = 0) OR (a%!28 = 0) THEN ENDPROC
 $(a%!28) = LEFT$(text$, a%!36 - 1)
