@@ -32,6 +32,9 @@ REM \param file$		The filename of the message file.
 DEF PROCmessage_initialise(file$)
 LOCAL size%, flags%, buffer%
 
+MessageBufferSize% = 256
+DIM MessageBuffer% MessageBufferSize% - 1
+
 DIM MessageBlock% 16
 SYS "MessageTrans_FileInfo",,file$ TO flags%,,size%
 
@@ -51,6 +54,21 @@ LOCAL text$
 IF token$ = "" THEN = ""
 
 SYS "MessageTrans_Lookup", MessageBlock%, token$ TO ,,text$
+=text$
+
+
+REM Look up a simple message token in the file, returning the message text.
+REM
+REM \param token$		The token to look up.
+REM \return			The corresponding message text.
+:
+DEF FNmessage_param_lookup(token$, param1$, param2$, param3$, param4$)
+LOCAL text$
+
+IF token$ = "" THEN = ""
+
+SYS "MessageTrans_Lookup", MessageBlock%, token$, MessageBuffer%, MessageBufferSize%, param1$, param2$, param3$, param4$
+SYS "XOS_GenerateError", MessageBuffer% TO text$
 =text$
 
 
