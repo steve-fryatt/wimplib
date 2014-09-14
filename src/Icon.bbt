@@ -312,7 +312,7 @@ LOCAL text$, length%
 
 IF a%!4 > -1 THEN
 	SYS "Wimp_GetIconState",,a%
-	SYS "XOS_GenerateError", a% + 28 TO text$
+	SYS "XOS_GenerateError", a%!28 TO text$
 	length% = LEN(text$)
 ELSE
 	length% = 0
