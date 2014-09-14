@@ -39,15 +39,16 @@ IF (a%!24 AND &100) = 0 THEN =0
 =a%!28
 
 
-REM Get the address of an icon's validation string.
+REM Get the address of an icon's validation string (assuming indirected and
+REM text flag set).
 REM
 REM \param window%		The handle of the window containing the icon.
 REM \param icon%		The number of the icon of interest.
-REM \return			Pointer to the string, or 0 if not indirected.
+REM \return			Pointer to the string, or 0 if not available.
 :
 DEF FNicon_validation(!a%, a%!4)
 SYS "Wimp_GetIconState",,a%
-IF (a%!24 AND &100) = 0 THEN =0
+IF (a%!24 AND &101) <> &101 THEN =0
 =a%!32
 
 
