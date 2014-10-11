@@ -53,12 +53,12 @@ REM \param window%		The handle of the window to open.
 REM \param x%			The X coordinate of the top-left of the window.
 REM \param y%			The Y coordinate of the top-left of the window.
 :
-DEF PROCwindow_open_at(!a%,x%,y%)
+DEF PROCwindow_open_at(!a%, x%, y%)
 SYS "Wimp_GetWindowState",,a%
-a%!8=y%-(a%!16-a%!8)
-a%!12=x%+(a%!12-a%!4)
-a%!16=y%
-a%!4=x%
+a%!8 = y% - (a%!16 - a%!8)
+a%!12 = x% + (a%!12 - a%!4)
+a%!16 = y%
+a%!4 = x%
 SYS "Wimp_OpenWindow",,a%
 ENDPROC
 
@@ -71,15 +71,15 @@ REM \param x%			The X coordinate of the centre of the window.
 REM \param y%			The Y coordinate of the centre of the window.
 :
 DEF PROCwindow_open_centred_at(!a%, x%, y%)
-LOCAL width%,height%
+LOCAL width%, height%
 SYS "Wimp_GetWindowState",,a%
-width%=(a%!12-a%!4)
-height%=(a%!16-a%!8)
-a%!4=x%-width%/2
-a%!8=y%-height%/2
-IF a%!8<96 THEN a%!8=96
-a%!12=a%!4+width%
-a%!16=a%!8+height%
+width% = (a%!12 - a%!4)
+height% = (a%!16 - a%!8)
+a%!4 = x% - width% / 2
+a%!8 = y% - height% / 2
+IF a%!8 < 96 THEN a%!8 = 96
+a%!12 = a%!4 + width%
+a%!16 = a%!8 + height%
 SYS "Wimp_OpenWindow",,a%
 ENDPROC
 
