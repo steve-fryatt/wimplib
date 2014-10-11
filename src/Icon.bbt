@@ -308,17 +308,31 @@ REM \param window%		The handle of the window containing the icon.
 REM \param icon%		The number of the icon to take the caret, or
 REM 				-1 to give a window focus on the work area.
 :
-DEF PROCicon_put_caret_at_end(!a%, a%!4)
+DEF PROCicon_put_caret_at_end(window%, icon%)
+PROCicon_put_caret(window%, icon%, -1)
+ENDPROC
+
+
+REM Place the caret at the end of an icon, or give a window focus.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon to take the caret, or
+REM 				-1 to give a window focus on the work area.
+REM \param position%		The index into the text at which to place the
+REM				caret, or -1 to place at the end.
+:
+DEF PROCicon_put_caret(!a%, q%!4, position%)
 LOCAL text$, length%
 
 IF a%!4 > -1 THEN
 	SYS "Wimp_GetIconState",,a%
 	SYS "XOS_GenerateError", a%!28 TO text$
 	length% = LEN(text$)
+	IF position% < 0 OR position% > length% THEN position% = length%
 ELSE
-	length% = 0
+	position% = 0
 ENDIF
-SYS "Wimp_SetCaretPosition", !a%, a%!4,,, -1, length%
+SYS "Wimp_SetCaretPosition", !a%, a%!4,,, -1, position%
 ENDPROC
 
 
@@ -364,7 +378,9 @@ ENDPROC
 
 REM Create a standard Iconbar icon, returning the handle of the icon.
 REM
-REM \param window%		The window to create the icon in (-1 for iconbar).
+REM \param window%		The window to create the icon in (-1 for the
+REM				right-hand side of the iconbar, -2 for the
+REM				left-hand side).
 REM \param sprite$		The name of the sprite to use, from the Wimp Pool.
 REM \return			The handle of the newly created icon.
 :
