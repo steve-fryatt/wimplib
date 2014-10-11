@@ -92,7 +92,7 @@ REM \param x%			The X coordinate of the top-left of the window.
 REM \param y%			The Y coordinate of the top-left of the window.
 :
 DEF PROCwindow_open_as_menu_at(window%, x%, y%)
-SYS "Wimp_CreateMenu",,window%, x%, y%
+SYS "Wimp_CreateMenu",,window%, x% - 64, y%
 ENDPROC
 
 
