@@ -314,7 +314,7 @@ ENDPROC
 
 
 REM Place the caret at the end of an icon, or give a window focus.
-REMput_caret
+REM
 REM \param window%		The handle of the window containing the icon.
 REM \param icon%		The number of the icon to take the caret, or
 REM 				-1 to give a window focus on the work area.
