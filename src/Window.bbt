@@ -33,7 +33,7 @@ REM \return			TRUE if the window is open; FALSE if not.
 :
 DEF FNwindow_is_open(!a%)
 SYS "Wimp_GetWindowState",,a%
-=(a%!32 AND &10000)=&10000
+=(a%!32 AND &10000) = &10000
 
 
 REM Open a window at the top of the window stack.
@@ -42,7 +42,7 @@ REM \param window%		The handle of the window to open.
 :
 DEF PROCwindow_open(!a%)
 SYS "Wimp_GetWindowState",,a%
-a%!28=-1
+a%!28 = -1
 SYS "Wimp_OpenWindow",,a%
 ENDPROC
 
