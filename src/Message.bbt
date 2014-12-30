@@ -90,4 +90,3 @@ IF (flags% AND 1) = 0 THEN =TRUE
 
 token$ = ""
 =FALSE
-
