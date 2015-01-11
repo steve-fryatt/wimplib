@@ -67,8 +67,7 @@ LOCAL text$
 
 IF token$ = "" THEN = ""
 
-SYS "MessageTrans_Lookup", MessageBlock%, token$, MessageBuffer%, MessageBufferSize%, param1$, param2$, param3$, param4$
-SYS "XOS_GenerateError", MessageBuffer% TO text$
+SYS "MessageTrans_Lookup", MessageBlock%, token$, MessageBuffer%, MessageBufferSize%, param1$, param2$, param3$, param4$ TO ,,text$
 =text$
 
 
