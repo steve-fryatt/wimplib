@@ -27,6 +27,33 @@ REM
 REM The variable a% is reqired to point to 256 bytes of memory.
 
 
+REM Return the text from an icon, whether indirected or not.
+REM
+REM \param window%		The handle of the window containing the icon.
+REM \param icon%		The number of the icon of interest.
+REM \return			The text contained in the icon.
+:
+DEF FNicon_get_text(!a%, a%!4)
+LOCAL string$, length%, ptr%, char%
+
+SYS "Wimp_GetIconState",,a%
+
+IF (a%!24 AND &100) = 0 THEN
+	ptr% = a% + 28
+	length% = 0
+	string$ = ""
+
+	REPEAT
+		char% = ptr%?length%
+		IF (char% >= 32) THEN string$ += CHR$(char%)
+		length% += 1
+	UNTIL (char% < 32) OR (length% > 12)
+ELSE
+	string$ = FNstring_read(a%!28)
+ENDIF
+=string$
+
+
 REM Get the address of an icon's indirected text buffer.
 REM
 REM \param window%		The handle of the window containing the icon.
