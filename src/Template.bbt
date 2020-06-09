@@ -48,6 +48,34 @@ SYS "Wimp_CloseTemplate"
 ENDPROC
 
 
+REM Load a window definition from a template into a supplied block of memory,
+REM bounds-checking the buffer first. The indirected data space is allocated
+REM from the BASIC heap.
+REM
+REM \param name$		The name of the template to be loaded.
+REM \param buffer%		Pointer to a buffer to take the definition.
+REM \param size%		The buffer size.
+REM \param fonts%		Pointer to the font reference array, or -1.
+:
+DEF PROCtemplate_load_claim(name$, buffer%, size%, fonts%)
+LOCAL templ_size%, indir_size%, workspace%
+
+REM Find the size required for the template and indirected data.
+
+$TemplateName%=LEFT$(name$ + STRING$(12, CHR$(13)), 12)
+SYS "Wimp_LoadTemplate",,,,, -1, TemplateName%, 0 TO ,templ_size%, indir_size%
+
+REM Return if the template won't fit in the buffer.
+
+IF templ_size% > buffer% THEN ENDPROC
+
+REM Claim the required indirection block.
+
+DIM workspace% indir_size% - 1
+size% = indir_size%
+
+REM Fall through to the legacy load routine with the correct parameters.
+
 REM Load a window definition from a template into a supplied block of memory.
 REM Note that the supplied buffer IS NOT BOUNDS CHECKED.
 REM
