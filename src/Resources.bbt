@@ -54,6 +54,148 @@ IF type% < 2 OR type% > 3 THEN folder$ = path$ + ".UK"
 =folder$ + "."
 
 
+REM Initialise the resources path set, ready for looking up resource file names.
+REM
+REM \param path$		The path of the resources folder to use.
+REM \param default$		The default folder to use as a fallback.
+REM \param appvar$		The application language variable name.
+:
+DEF PROCresources_initialise_paths(path$, default$, appvar$)
+LOCAL value$
+
+ResourcesMaxFolders% = 20
+ResourcesFolderCount% = 0
+DIM ResourcesFolders$(ResourcesMaxFolders%)
+
+IF RIGHT$(path$, 1) <> "." THEN path$ += "."
+ResourcesFolders$(0) = path$
+
+REM Add in any countries stored in AppName$Language.
+
+value$ = FNresources_get_var(appvar$)
+IF value$ <> "" THEN PROCresources_add_path_set(value$)
+
+REM Add any countries stored in ResFind$LanguagesPref.
+
+value$ = FNresources_get_var("ResFind$LanguagesPref")
+IF value$ <> "" THEN PROCresources_add_path_set(value$)
+
+REM Add the configured country.
+
+value$ = FNresources_get_country
+IF value$ <> "" THEN PROCresources_add_path_set(value$)
+
+REM Add any countries stored in ResFind$LanguagesSuff.
+
+value$ = FNresources_get_var("ResFind$LanguagesSuff")
+IF value$ <> "" THEN PROCresources_add_path_set(value$)
+
+REM Add in the fallback folder.
+
+PROCresources_add_path_set(default$)
+ENDPROC
+
+
+REM Take a comma-separated list of country names, and test each
+REM one against the available resource folders. For each that exists,
+REM add the name to our list.
+REM
+REM \param list$		The list of folders to add.
+:
+DEF PROCresources_add_path_set(list$)
+LOCAL pos%, dir$, path$, object_type%, flags%
+
+WHILE LEN(list$) > 0
+	pos% = INSTR(list$, ",")
+	IF pos% = 0 THEN
+		dir$ = list$
+		list$ = ""
+	ELSE
+		dir$ = LEFT$(list$, pos% - 1)
+		list$ = MID$(list$, pos% + 1)
+	ENDIF
+
+	IF LEN(dir$) > 0 THEN
+		SYS "XOS_File", 17, ResourcesFolders$(0) + dir$ TO object_type% ;flags%
+		IF (flags% AND 1) = 0 AND object_type% = 2 AND ResourcesFolderCount% < ResourcesMaxFolders% THEN
+			ResourcesFolderCount% += 1
+			ResourcesFolders$(ResourcesFolderCount%) = dir$ + "."
+		ENDIF
+	ENDIF
+ENDWHILE
+ENDPROC
+
+
+REM Read the value of a string variable.
+REM
+REM \param varname$		The name of the variable to read.
+REM \return			The variable contents, or "" on failure.
+:
+DEF FNresources_get_var(varname$)
+LOCAL flags%, length%, type%
+
+REM Read the variable value, and return "" on failure.
+
+SYS "XOS_ReadVarVal", varname$, a%, 256, 0, 3 TO ,,length%,,type% ;flags%
+IF (flags% AND 1) = 1 OR type% <> 0 OR length% = 0 THEN =""
+
+REM Terminate and return.
+
+a%?length% = 13
+=$a%
+
+
+REM Read the name of the cunrrently configured country.
+REM
+REM \return			The country name, or "" on failure
+:
+DEF FNresources_get_country
+LOCAL flags%, length%, country%, claimed%
+
+REM Read the configured country number.
+
+SYS "XOS_Byte", 70, 127 TO ,country% ;flags%
+IF (flags% AND 1) = 1 THEN =""
+
+REM Convert the number into a name.
+
+SYS "XOS_ServiceCall",,67, 2, country%, a%, 256 TO ,claimed%,,,,length% ;flags%
+IF (flags% AND 1) = 1 OR claimed% <> 0 OR length% = 0 THEN =""
+
+REM Terminate and return.
+
+a%?length% = 13
+=$a%
+
+
+REM Search for a file of a given name and filetype by order of preference in
+REM the folders configured by PROCresources_initialise_paths(). If one is
+REM found, return its full name; in file is found, "" is returned.
+REM
+REM \param file$		The name of the required file.
+REM \param type%		The RISC OS filetype of the required file.
+REM \return			The matched filename if one was found; otherwise "".
+:
+DEF FNresources_find_file(file$, type%)
+LOCAL folder%, path$, object_type%, file_type%, flags%
+
+REM Run through the list of resource folders, testing for the file in each.
+
+folder% = 1
+path$ = ""
+
+WHILE folder% <= ResourcesFolderCount% AND path$ = ""
+	path$ = ResourcesFolders$(0) + ResourcesFolders$(folder%) + file$
+
+	SYS "XOS_File", 23, path$ TO object_type%,,,,,,file_type% ;flags%
+	IF (flags% AND 1) = 1 OR object_type% <> 1 OR file_type% <> type% THEN path$ = ""
+
+	folder% += 1
+ENDWHILE
+
+=path$
+
+
 REM Search a folder containing numeric filenames, and return the file with the
 REM greatest number that is less than or equal to a target value. Optionally,
 REM the files tested can all have a prefix on their name (which will be
