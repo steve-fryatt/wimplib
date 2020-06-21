@@ -92,6 +92,7 @@ IF value$ <> "" THEN PROCresources_add_path_set(value$)
 
 REM Add in the fallback folder.
 
+IF default$ = "" THEN default$ = "UK"
 PROCresources_add_path_set(default$)
 ENDPROC
 
