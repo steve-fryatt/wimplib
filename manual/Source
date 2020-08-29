@@ -9,7 +9,7 @@
 =============================================================================
 WimpLib - BASIC Routines for Wimp Programming                    Version $$version$$
 
-(c) Stephen Fryatt, 1996-2014                  $$date$$
+(c) Stephen Fryatt, 1996-2020                  $$date$$
 =============================================================================
 </literal>
 
@@ -19,7 +19,7 @@ WimpLib - BASIC Routines for Wimp Programming                    Version $$versi
 
 <chapter title="License" file="License">
 
-<cite>WimpLib</cite> is licensed under the EUPL, Version&nbsp;1.1 only (the &ldquo;Licence&rdquo;); you may not use this work except in compliance with the Licence.
+<cite>WimpLib</cite> is licensed under the EUPL, Version&nbsp;1.2 only (the &ldquo;Licence&rdquo;); you may not use this work except in compliance with the Licence.
 
 You may obtain a copy of the Licence at <link ref="#url http://joinup.ec.europa.eu/software/page/eupl">http://joinup.ec.europa.eu/software/page/eupl</link>
 
