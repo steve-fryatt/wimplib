@@ -40,20 +40,6 @@ SYS "XOS_GenerateError",a% TO name$
 =name$
 
 
-REM Return the folder path for resources for the current territory, based on
-REM the supplied resources path.
-REM
-REM \param path$		The path to search on.
-REM \return			The territory path, with trailing . 
-:
-DEF FNresources_find_territory_folder(path$)
-LOCAL folder$, type%
-folder$ = path$ + "." + FNresources_territory_name
-SYS "XOS_File", 5, folder$ TO type%
-IF type% < 2 OR type% > 3 THEN folder$ = path$ + ".UK"
-=folder$ + "."
-
-
 REM Initialise the resources path set, ready for looking up resource file names.
 REM
 REM \param path$		The path of the resources folder to use.
@@ -230,4 +216,3 @@ REPEAT
 UNTIL next% = -1
 
 =version$
-
