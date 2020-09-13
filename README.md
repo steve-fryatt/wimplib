@@ -1,7 +1,7 @@
 WimpLib
 =======
 
-BASIC Routines for Wimp Programming.
+BASIC Routines for Wimp Programming on RISC OS.
 
 
 Introduction
@@ -19,7 +19,7 @@ Installation
 
 To install and use WimpLib, it will be necessary to have suitable Linux system with a working installation of the [GCCSDK](http://www.riscos.info/index.php/GCCSDK).
 
-It will also be necessary to ensure that the `SFTOOLS_BIN`, `$SFTOOLS_MAKE` and `$SFTOOLS_BASIC` variables are set to a suitable location within the current environment. For example
+It will also be necessary to ensure that the `SFTOOLS_BIN`, `$SFTOOLS_BASIC` and `$SFTOOLS_MAKE` variables are set to a suitable location within the current environment. For example
 
 	export SFTOOLS_BIN=/home/steve/sftools/bin
 	export SFTOOLS_BASIC=/home/steve/sftools/basic
@@ -34,6 +34,16 @@ To install WimpLib, use
 from the root folder of the project, which will copy the BASICTxt files in to the location indicated by `$SFTOOLS_BASIC`.
 
 A ReadMe for WimpLib will be generated in the build folder, along with copies of the library files in both BASICTxt and toklenised BASIC formats.
+
+
+Building for native use
+-----------------------
+
+To build WimpLib for use natively on RISC OS, you can use
+
+	make release
+
+and a Zip archive of the release will appear in the parent folder to the location of the project itself.
 
 
 Licence
