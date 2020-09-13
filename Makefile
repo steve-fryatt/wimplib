@@ -158,6 +158,7 @@ backup:
 # of the RISC OS target.
 
 install: clean all
+	$(MKDIR) $(SFTOOLS_BASIC)
 	for f in $(LIBRARIES); do $(CP) $(SRCDIR)/$$f $(SFTOOLS_BASIC)/$${f%.bbt}; done
 
 
