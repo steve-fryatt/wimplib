@@ -56,7 +56,7 @@ BUZIPFILE := wimplib$(shell date "+%Y%m%d").zip
 
 # Build Tools
 
-MKDIR := mkdir
+MKDIR := mkdir -p
 RM := rm -rf
 CP := cp
 
@@ -99,6 +99,7 @@ LIBRARIES := Config.bbt Date.bbt Icon.bbt LegacyWimp.bbt Legacy3D.bbt Menu.bbt		
 
 MANSRC := Source
 MANSPR := ManSprite
+LICSRC ?= Licence
 
 # Build everything, but don't package it for release.
 
@@ -108,18 +109,32 @@ all: libs documentation
 
 libs: $(addprefix $(OUTDIR)/$(BASDIR)/, $(LIBRARIES:.bbt=,ffb)) $(addprefix $(OUTDIR)/$(TXTDIR)/, $(LIBRARIES:.bbt=,fd1))
 
-$(OUTDIR)/$(BASDIR)/%,ffb: $(SRCDIR)/%.bbt
+$(OUTDIR)/$(BASDIR)/%,ffb: $(SRCDIR)/%.bbt $(OUTDIR)/$(BASDIR)
 	$(TOKENIZE) $(TOKFLAGS) $< -out $@
 
-$(OUTDIR)/$(TXTDIR)/%,fd1: $(SRCDIR)/%.bbt
+$(OUTDIR)/$(TXTDIR)/%,fd1: $(SRCDIR)/%.bbt $(OUTDIR)/$(TXTDIR)
 	$(CP) $< $@
+
+# Create a folder to take the output.
+
+$(OUTDIR)/$(TXTDIR): $(OUTDIR)
+	$(MKDIR) $(OUTDIR)/$(TXTDIR)
+
+$(OUTDIR)/$(BASDIR): $(OUTDIR)
+	$(MKDIR) $(OUTDIR)/$(BASDIR)
+
+$(OUTDIR):
+	$(MKDIR) $(OUTDIR)
 
 # Build the documentation
 
-documentation: $(OUTDIR)/$(README)
+documentation: $(OUTDIR)/$(README) $(OUTDIR)/$(LICENCE)
 
 $(OUTDIR)/$(README): $(MANUAL)/$(MANSRC)
 	$(MANTOOLS) -MTEXT -I$(MANUAL)/$(MANSRC) -O$(OUTDIR)/$(README) -D'version=$(HELP_VERSION)' -D'date=$(HELP_DATE)'
+
+$(OUTDIR)/$(LICENCE): $(LICSRC)
+	$(CP) $(LICSRC) $(OUTDIR)/$(LICENCE)
 
 
 # Build the release Zip file.
@@ -152,3 +167,4 @@ clean:
 	$(RM) $(OUTDIR)/$(README)
 	$(RM) $(OUTDIR)/$(TXTDIR)/*
 	$(RM) $(OUTDIR)/$(BASDIR)/*
+	$(RM) $(OUTDIR)/$(LICENCE)
