@@ -152,9 +152,9 @@ backup:
 	$(ZIP) $(BUZIPFLAGS) ../$(BUZIPFILE) *
 
 
-# Install the finished version in the GCCSDK, ready for use.  It's not a striaghtforward
-# copy, as we need to strip the file extensions that are in build/ for the benefit
-# of the RISC OS target.
+# Install the finished version in the SFTools folder, ready for use.  It's not a
+# striaghtforward copy, as we need to strip the file extensions that are in build/
+# for the benefit of the RISC OS target.
 
 install: clean all
 	$(MKDIR) $(SFTOOLS_BASIC)
