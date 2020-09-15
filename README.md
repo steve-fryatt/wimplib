@@ -31,7 +31,7 @@ To install WimpLib, use
 
 	make install
 
-from the root folder of the project, which will copy the BASICTxt files in to the location indicated by `$SFTOOLS_BASIC`.
+from the root folder of the project, which will copy the BASICTxt files in to the location indicated by `$SFTOOLS_BASIC`. It will also copy the TokenizeSWIs.h file into `$GCCSDK_INSTALL_ENV/include/` so that it is available when tokenising BASIC code.
 
 A ReadMe for WimpLib will be generated in the build folder, along with copies of the library files in both BASICTxt and toklenised BASIC formats.
 

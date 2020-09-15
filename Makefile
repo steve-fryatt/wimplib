@@ -1,4 +1,4 @@
-# Copyright 2014, Stephen Fryatt (info@stevefryatt.org.uk)
+# Copyright 2014-2020, Stephen Fryatt (info@stevefryatt.org.uk)
 #
 # This file is part of WimpLib:
 #
@@ -60,6 +60,7 @@ RM := rm -rf
 CP := cp
 
 ZIP := $(GCCSDK_INSTALL_ENV)/bin/zip
+INSTALL := $(GCCSDK_INSTALL_ENV)/ro-install
 
 MANTOOLS := $(SFTOOLS_BIN)/mantools
 BINDHELP := $(SFTOOLS_BIN)/bindhelp
@@ -83,13 +84,13 @@ TOKFLAGS :=
 SRCDIR := src
 MANUAL := manual
 OUTDIR := build
-LICENCE := Licence,fff
 TXTDIR := Text
 BASDIR := BASIC
 
 # Set up the named target files.
 
 README := ReadMe,fff
+LICENCE := Licence,fff
 LIBRARIES := Config.bbt Date.bbt Icon.bbt LegacyWimp.bbt Legacy3D.bbt Menu.bbt		\
              Message.bbt Resources.bbt String.bbt Template.bbt Url.bbt WimpError.bbt	\
              WimpLib.bbt WimpSprite.bbt Window.bbt
@@ -98,7 +99,8 @@ LIBRARIES := Config.bbt Date.bbt Icon.bbt LegacyWimp.bbt Legacy3D.bbt Menu.bbt		
 
 MANSRC := Source
 MANSPR := ManSprite
-LICSRC ?= Licence
+LICSRC := Licence
+SWINAMES := TokenizeSWIs.h
 
 # Build everything, but don't package it for release.
 
@@ -159,6 +161,7 @@ backup:
 install: clean all
 	$(MKDIR) $(SFTOOLS_BASIC)
 	for f in $(LIBRARIES); do $(CP) $(SRCDIR)/$$f $(SFTOOLS_BASIC)/$${f%.bbt}; done
+	$(INSTALL) $(OUTDIR)/$(SWINAMES) $(GCCSDK_INSTALL_ENV)/include/$(SWINAMES)
 
 
 # Clean targets
