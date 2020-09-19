@@ -188,31 +188,56 @@ REM greatest number that is less than or equal to a target value. Optionally,
 REM the files tested can all have a prefix on their name (which will be
 REM removed before testing).
 REM
+REM The folder will be located somewhere in the folders configured by
+REM PROCresources_initialise_paths(), which much have been called before this
+REM routine is used.
+REM
 REM \param dir$			The directory to search in.
 REM \param prefix$		The optional filename prefix, or "".
 REM \param target%		The target version number.
 REM \return			The name of the file found, or "".
 :
 DEF FNresources_find_latest_object(dir$, prefix$, target%)
-LOCAL next%, version%, file_name$, version$
+LOCAL folder%, path$, object_type%, next%, version%, file_name$, version$, flags%
+
+REM Run through the list of resource folders, testing for the folder in each.
+
+folder% = 1
+path$ = ""
+
+WHILE folder% <= ResourcesFolderCount% AND path$ = ""
+	path$ = ResourcesFolders$(0) + ResourcesFolders$(folder%) + dir$
+
+	SYS "XOS_File", 23, path$ TO object_type% ;flags%
+	IF (flags% AND 1) = 1 OR object_type% <> 2 THEN path$ = ""
+
+	folder% += 1
+ENDWHILE
+
+REM The required folder wasn't found.
+
+IF path$ = "" THEN =""
+
+REM Now scan the folder looking for the most recent file matching the
+REM target criteria.
 
 next%=0
 version%=-1
 
 REPEAT
-	SYS "OS_GBPB", 11, dir$, a%, 1, next%, 255, "*" TO ,,,read%, next%
-	IF read% > 0 THEN
+	SYS "XOS_GBPB", 11, path$, a%, 1, next%, 255, "*" TO ,,,read%, next% ;flags%
+	IF read% > 0 AND (flags% AND 1) = 0 THEN
 		SYS "XOS_GenerateError",a% + 29 TO file_name$
 
 		IF prefix$ <> "" OR LEFT$(file_name$, LEN(prefix$)) = prefix$ THEN
 			IF prefix$ <> "" THEN file_name$ = MID$(file_name$, LEN(prefix$) + 1)
 
 			IF VAL(file_name$) > version% AND VAL(file_name$) <= target% THEN
-				version%=VAL(file_name$)
-				version$=file_name$
+				version% = VAL(file_name$)
+				version$ = path$ + "." + file_name$
 			ENDIF
 		ENDIF
 	ENDIF
-UNTIL next% = -1
+UNTIL next% = -1 OR (flags% AND 1) = 1
 
 =version$
