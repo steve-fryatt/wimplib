@@ -27,19 +27,6 @@ REM
 REM The variable a% is reqired to point to 256 bytes of memory.
 
 
-REM Return the name of the current terriory, as used in an application's
-REM resources.
-REM
-REM \return			The territory name.
-:
-DEF FNresources_territory_name
-LOCAL territory%, name$
-SYS "Territory_Number" TO territory%
-SYS "Territory_NumberToName", territory%, a%, 256
-SYS "XOS_GenerateError",a% TO name$
-=name$
-
-
 REM Initialise the resources path set, ready for looking up resource file names.
 REM
 REM \param path$		The path of the resources folder to use.
