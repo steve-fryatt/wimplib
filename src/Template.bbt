@@ -67,7 +67,7 @@ SYS "Wimp_LoadTemplate",,,,, -1, TemplateName%, 0 TO ,templ_size%, indir_size%
 
 REM Return if the template won't fit in the buffer.
 
-IF templ_size% > buffer% THEN ENDPROC
+IF templ_size% > size% THEN ENDPROC
 
 REM Claim the required indirection block.
 
